@@ -1,24 +1,41 @@
-import axios from 'axios';
+import axios from "axios"
 
-const API_BASE_URL = 'http://localhost:8080/api'; // Replace with your actual API base URL
+const API_BASE_URL = "http://localhost:8080/api" // Replace with your actual API base URL
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-  }
-});
-
-// withCredentials: true;
+  },
+  withCredentials: true,
+})
 
 export const api = {
+  // Authentication
   login: (credentials) => axiosInstance.post("/auth/login", credentials),
   register: (userData) => axiosInstance.post("/auth/register", userData),
   logout: () => axiosInstance.post("/auth/logout"),
-  getCompanyData: () => axiosInstance.get("/company"),
-  createCompany: (companyData) => axiosInstance.post("/company", companyData),
-  updateCompany: (companyData) => axiosInstance.put("/company", companyData),
+
+  // Company
+  userData: () => axiosInstance.get("/user/current-user"),
+  getCompanyData: () => axiosInstance.get("/company/own"),
+  createCompany: (companyData) => axiosInstance.post("/company/own", companyData),
+  updateCompany: (companyData) => axiosInstance.put("/company/own", companyData),
+  uploadCompanyFiles: (files, metadata) => {
+    const formData = new FormData()
+    files.forEach((file) => {
+      formData.append("documents", file)
+    })
+    formData.append("types", JSON.stringify(metadata))
+    return axiosInstance.put("/company/own/document", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+  },
+
+  // Contractors
   getContractors: () => axiosInstance.get("/contractors"),
   getContractorDetails: (id) => axiosInstance.get(`/contractors/${id}`),
   addContractor: (contractorData) => axiosInstance.post("/contractors", contractorData),
@@ -26,3 +43,4 @@ export const api = {
   getDocumentRisks: (id) => axiosInstance.get(`/documents/${id}/risks`),
   getInteractionPossibilities: (id) => axiosInstance.get(`/contractors/${id}/possibilities`),
 }
+
