@@ -22,18 +22,19 @@ export const api = {
   getCompanyData: () => axiosInstance.get("/company/own"),
   createCompany: (companyData) => axiosInstance.post("/company/own", companyData),
   updateCompany: (companyData) => axiosInstance.put("/company/own", companyData),
-  uploadCompanyFiles: (files, metadata) => {
+  uploadCompanyFiles: (companyId, files, types) => {
     const formData = new FormData()
-    files.forEach((file) => {
+    files.forEach((file, index) => {
       formData.append("documents", file)
+      formData.append("types", types[index])
     })
-    formData.append("types", JSON.stringify(metadata))
-    return axiosInstance.put("/company/own/document", formData, {
+    return axiosInstance.put(`/company/own/${companyId}/document`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
   },
+  getCompanyFiles: () => axiosInstance.get("/company/own/documents"),
 
   // Contractors
   getContractors: () => axiosInstance.get("/contractors"),
