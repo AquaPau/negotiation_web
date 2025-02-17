@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { api } from "@/api/api"
-import FileUpload from "@/components/FileUpload"
 import CreateCompanyModal from "@/components/CreateCompanyModal"
+import FileUploadDialog from "@/components/FileUploadDialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const Dashboard = () => {
   const [companyData, setCompanyData] = useState(null)
-  const [showFileUpload, setShowFileUpload] = useState(false)
+  const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false)
   const [uploadMessage, setUploadMessage] = useState("")
   const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -59,7 +59,8 @@ const Dashboard = () => {
 
   const handleUploadSuccess = (message) => {
     setUploadMessage(message)
-    setShowFileUpload(false)
+    setIsFileUploadDialogOpen(false)
+    // Optionally, you can refresh the company data here to show the updated file list
     fetchUserCompany()
   }
 
@@ -78,19 +79,15 @@ const Dashboard = () => {
           <>
             <Card>
               <CardHeader>
-                <CardTitle>{companyData.name}</CardTitle>
+                <CardTitle>{companyData.customUserGeneratedName}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Country: {companyData.country}</p>
-                {companyData.inn && (
-                  <>
-                    <p>INN: {companyData.inn}</p>
-                    <p>OGRN: {companyData.ogrn}</p>
-                    <p>Address: {companyData.address}</p>
-                    <p>CEO Position: {companyData.ceoPosition}</p>
-                    <p>CEO Name: {companyData.ceoName}</p>
-                  </>
-                )}
+                <p>Country: {companyData.residence}</p>
+                {companyData.inn && companyData.inn !== "null" && <p>INN: {companyData.inn}</p>}
+                {companyData.ogrn && companyData.ogrn !== "null" && <p>OGRN: {companyData.ogrn}</p>}
+                {companyData.fullName && <p>Full Name: {companyData.fullName}</p>}
+                {companyData.managerName && <p>Manager Name: {companyData.managerName}</p>}
+                {companyData.managerTitle && <p>Manager Title: {companyData.managerTitle}</p>}
               </CardContent>
             </Card>
             <Button className="mt-4" onClick={handleUpdateCompany}>
@@ -104,11 +101,7 @@ const Dashboard = () => {
                 {uploadMessage && (
                   <p className={uploadMessage.includes("error") ? "text-red-500" : "text-green-500"}>{uploadMessage}</p>
                 )}
-                {showFileUpload ? (
-                  <FileUpload onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
-                ) : (
-                  <Button onClick={() => setShowFileUpload(true)}>Upload Documents</Button>
-                )}
+                <Button onClick={() => setIsFileUploadDialogOpen(true)}>Upload Documents</Button>
               </CardContent>
             </Card>
           </>
@@ -122,11 +115,16 @@ const Dashboard = () => {
         onClose={() => setIsCreateCompanyModalOpen(false)}
         onCreateCompany={handleCreateCompany}
       />
+      <FileUploadDialog
+        isOpen={isFileUploadDialogOpen}
+        onClose={() => setIsFileUploadDialogOpen(false)}
+        onUploadSuccess={handleUploadSuccess}
+        onUploadError={handleUploadError}
+        companyId={companyData?.id}
+      />
     </div>
   )
 }
 
 export default Dashboard
-
-
 
