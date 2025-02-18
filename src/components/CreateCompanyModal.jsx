@@ -18,6 +18,7 @@ const countries = [
 
 const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
   const [companyName, setCompanyName] = useState("")
+  const [ogrn, setOgrn] = useState("")
   const [country, setCountry] = useState("RU")
   const [userId, setUserId] = useState(null)
 
@@ -36,21 +37,27 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onCreateCompany(companyName, country)
+    onCreateCompany(companyName, ogrn, country)
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Company</DialogTitle>
+          <DialogTitle>Создать новую компанию</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
-              Company Name
+              Название компании
             </label>
             <Input id="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+          </div>
+          <div>
+            <label htmlFor="ogrn" className="block text-sm font-medium text-gray-700">
+              ОГРН
+            </label>
+            <Input id="ogrn" value={ogrn} onChange={(e) => setOgrn(e.target.value)} required />
           </div>
           <div>
             <label htmlFor="country" className="block text-sm font-medium text-gray-700">

@@ -34,7 +34,7 @@ export const api = {
       },
     })
   },
-  getCompanyFiles: () => axiosInstance.get("/company/own/documents"),
+  getCompanyDocuments: (companyId) => axiosInstance.get(`/company/own/${companyId}/documents`),
 
   // Contractors
   getContractors: () => axiosInstance.get("/contractors"),
