@@ -6,9 +6,11 @@ import CreateCompanyModal from "@/components/CreateCompanyModal"
 import FileUploadDialog from "@/components/FileUploadDialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 const Dashboard = () => {
   const [companyData, setCompanyData] = useState(null)
+  const [documents, setDocuments] = useState([])
   const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false)
   const [uploadMessage, setUploadMessage] = useState("")
   const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] = useState(false)
@@ -17,6 +19,12 @@ const Dashboard = () => {
   useEffect(() => {
     fetchUserCompany()
   }, [])
+
+  useEffect(() => {
+    if (companyData) {
+      fetchCompanyDocuments()
+    }
+  }, [companyData])
 
   const fetchUserCompany = async () => {
     setIsLoading(true)
@@ -31,13 +39,23 @@ const Dashboard = () => {
     }
   }
 
-  const handleCreateCompany = async (companyName, country) => {
+  const fetchCompanyDocuments = async () => {
+    try {
+      const response = await api.getCompanyDocuments(companyData.id)
+      setDocuments(response.data)
+    } catch (error) {
+      console.error("Failed to fetch company documents:", error)
+    }
+  }
+
+  const handleCreateCompany = async (companyName, ogrn, country) => {
     try {
       const userResponse = await api.userData()
       const user = userResponse.data
       const response = await api.createCompany({
         userId: user.id,
         customUserGeneratedName: companyName,
+        ogrn: ogrn,
         region: country,
         isOwn: true,
       })
@@ -60,8 +78,7 @@ const Dashboard = () => {
   const handleUploadSuccess = (message) => {
     setUploadMessage(message)
     setIsFileUploadDialogOpen(false)
-    // Optionally, you can refresh the company data here to show the updated file list
-    fetchUserCompany()
+    fetchCompanyDocuments()
   }
 
   const handleUploadError = (message) => {
@@ -109,7 +126,35 @@ const Dashboard = () => {
           <Button onClick={() => setIsCreateCompanyModalOpen(true)}>Create Company</Button>
         )}
       </div>
-      <div className="w-3/4 bg-background p-4">{/* Main content area */}</div>
+      <div className="w-3/4 bg-background p-4">
+        {companyData && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Uploaded Documents</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Description</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {documents.map((doc) => (
+                    <TableRow key={doc.id}>
+                      <TableCell>{doc.id}</TableCell>
+                      <TableCell>{doc.name}</TableCell>
+                      <TableCell>{doc.description || "N/A"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+      </div>
       <CreateCompanyModal
         isOpen={isCreateCompanyModalOpen}
         onClose={() => setIsCreateCompanyModalOpen(false)}
