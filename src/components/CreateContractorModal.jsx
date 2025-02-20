@@ -6,6 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+const countries = [
+  { code: "RU", name: "Russia" },
+  { code: "BY", name: "Belarus" },
+  { code: "KZ", name: "Kazakhstan" }
+]
+
 const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
   const [customName, setCustomName] = useState("")
   const [ogrn, setOgrn] = useState("")
@@ -13,14 +19,14 @@ const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onCreateContractor({ customName, ogrn, country })
+    onCreateContractor(customName, ogrn, country)
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Contractor</DialogTitle>
+          <DialogTitle>Новый контрагент</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -28,27 +34,28 @@ const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
               id="customName"
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
-              placeholder="Custom Contractor Name"
+              placeholder="Пользовательское имя контрагента"
               required
             />
           </div>
           <div>
-            <Input id="ogrn" value={ogrn} onChange={(e) => setOgrn(e.target.value)} placeholder="OGRN" required />
+            <Input id="ogrn" value={ogrn} onChange={(e) => setOgrn(e.target.value)} placeholder="ОГРН" required />
           </div>
           <div>
-            <Select value={country} onValueChange={setCountry} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Country of Origin" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="russia">Russia</SelectItem>
-                <SelectItem value="usa">USA</SelectItem>
-                <SelectItem value="china">China</SelectItem>
-                {/* Add more countries as needed */}
-              </SelectContent>
-            </Select>
+            <Select value={country} onValueChange={setCountry}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {countries.map((c) => (
+                              <SelectItem key={c.code} value={c.code}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
           </div>
-          <Button type="submit">Create Contractor</Button>
+          <Button type="submit">Создать</Button>
         </form>
       </DialogContent>
     </Dialog>

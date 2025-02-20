@@ -1,0 +1,246 @@
+import { useState, useEffect } from "react"
+import { api } from "@/api/api"
+import { useParams, useNavigate } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import CreateContractorModal from "@/components/CreateContractorModal"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import CompanyDocumentUploadDialog from "@/components/CompanyDocumentUploadDialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
+
+const Company = () => {
+
+  const params = useParams()
+  const [companyData, setCompanyData] = useState(null)
+  const [contractorsList, setContractorsList] = useState([])
+  const [documents, setDocuments] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isCompanyDocumentUploadDialogOpen, setIsCompanyDocumentUploadDialogOpen] = useState(false)
+  const [isCreateContractorModalOpen, setIsCreateContractorModalOpen] = useState(false)
+  const [uploadMessage, setUploadMessage] = useState("")
+  const navigate = useNavigate()
+
+
+  useEffect(() => {
+    if (params.companyId) {
+      fetchUserCompany()
+    }
+  }, [params.companyId])
+
+  useEffect(() => {
+    if (companyData) {
+      fetchCompanyDocuments()
+    }
+  }, [companyData])
+
+  useEffect(() => {
+    if (companyData) {
+      fetchCompanyContractors()
+    }
+  }, [companyData])
+
+  const fetchUserCompany = async () => {
+    setIsLoading(true)
+    try {
+      console.log(params)
+      const response = await api.getCompany(params.companyId)
+      console.log(response.data)
+      setCompanyData(response.data)
+    } catch (error) {
+      console.error("Failed to fetch user company data:", error)
+      setCompanyData(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchCompanyDocuments = async () => {
+    try {
+      const response = await api.getCompanyDocuments(companyData.id)
+      setDocuments(response.data)
+    } catch (error) {
+      console.error("Failed to fetch company documents:", error)
+    }
+  }
+
+  const fetchCompanyContractors = async () => {
+    setIsLoading(true)
+    try {
+      const response = await api.getContractors(companyData.id)
+      setContractorsList(response.data)
+    } catch (error) {
+      console.error("Failed to fetch company contractor list:", error)
+      setContractorsList([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleCreateContractor = async (contractorName, ogrn, country) => {
+    try {
+      const userResponse = await api.userData()
+      const user = userResponse.data
+      const response = await api.createContractor({
+        userId: user.id,
+        customUserGeneratedName: contractorName,
+        companyId: companyData.id,
+        ogrn: ogrn,
+        region: country
+      })
+      setIsCreateContractorModalOpen(false)
+    } catch (error) {
+      console.error("Failed to create company:", error)
+    }
+  }
+
+  const handleViewContractorsDetails = (contractorId) => {
+    if (companyData && companyData.id) {
+      const url = `/company/${companyData.id}/contractor/${contractorId}`
+      console.log("Navigating to:", url)
+      navigate(url)
+    } else {
+      console.error("Company data about contractor or ID is missing")
+    }
+  }
+
+  const handleUpdateCompany = async () => {
+    try {
+      await api.updateCompany(companyData)
+      await fetchUserCompany()
+    } catch (error) {
+      console.error("Failed to update company:", error)
+    }
+  }
+
+  const handleUploadSuccess = (message) => {
+    setUploadMessage(message)
+    setIsCompanyDocumentUploadDialogOpen(false)
+    fetchCompanyDocuments()
+  }
+
+  const handleUploadError = (message) => {
+    setUploadMessage(message)
+  }
+
+  if (isLoading) {
+    return <div className="text-center mt-8">Загрузка...</div>
+  }
+
+  return (
+    <div className="flex h-screen">
+      <div className="w-1/4 bg-sidebar p-4">
+        {companyData ? (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>{companyData.customUserGeneratedName}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>Страна регистрации: {companyData.residence}</p>
+                {companyData.fullName && <p>Наименование: {companyData.fullName}</p>}
+                {companyData.inn && companyData.inn !== "null" && <p>ИНН: {companyData.inn}</p>}
+                {companyData.ogrn && companyData.ogrn !== "null" && <p>ОГРН: {companyData.ogrn}</p>}
+                {companyData.managerTitle && <p>Исполнительный орган: {companyData.managerTitle}</p>}
+                {companyData.managerName && <p>ФИО исполнительного органа: {companyData.managerName}</p>}
+              </CardContent>
+            </Card>
+            <Button className="mt-4" onClick={handleUpdateCompany}>
+              Обновить данные компании
+            </Button>
+            <Card>
+              <CardHeader>
+                <CardTitle>Документы</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Наименование</TableHead>
+                      <TableHead>Описание содержания</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {documents.map((doc) => (
+                      <TableRow key={doc.id}>
+                        <TableCell>{doc.id}</TableCell>
+                        <TableCell>{doc.name}</TableCell>
+                        <TableCell>{doc.description || "N/A"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+            <Card className="mt-4">
+              <CardContent>
+                {uploadMessage && (
+                  <p className={uploadMessage.includes("error") ? "text-red-500" : "text-green-500"}>{uploadMessage}</p>
+                )}
+                <Button onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+              </CardContent>
+            </Card>
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Контрагенты</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {contractorsList.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Пользовательское название контрагента</TableHead>
+                        <TableHead>Детали контрагента</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {contractorsList.map((contr) => (
+                        <TableRow key={contr.id}>
+                          <TableCell>{contr.id}</TableCell>
+                          <TableCell>{contr.customName}</TableCell>
+                          <TableCell><Button onClick={() => handleViewContractorsDetails(contr.id)}>Данные контрагента</Button></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <CardHeader>
+                    <CardTitle> Контрагентов не найдено </CardTitle>
+                  </CardHeader>
+                )
+                }
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <Button onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
+              </CardContent>
+              <CreateContractorModal
+                isOpen={isCreateContractorModalOpen}
+                onClose={() => setIsCreateContractorModalOpen(false)}
+                onCreateContractor={handleCreateContractor}
+              />
+            </Card>
+          </>) : (
+          <CardHeader>
+            <CardTitle> Компания не найдена! </CardTitle>
+          </CardHeader>)}
+        <CompanyDocumentUploadDialog
+          isOpen={isCompanyDocumentUploadDialogOpen}
+          onClose={() => setIsCompanyDocumentUploadDialogOpen(false)}
+          onUploadSuccess={() => {
+            handleUploadSuccess
+            fetchCompanyDocuments()
+          }
+          }
+          onUploadError={handleUploadError}
+          companyId={companyData?.id}
+        />
+      </div>
+
+    </div>
+  );
+};
+
+export default Company
