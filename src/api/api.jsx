@@ -17,31 +17,55 @@ export const api = {
   register: (userData) => axiosInstance.post("/auth/register", userData),
   logout: () => axiosInstance.post("/auth/logout"),
 
-  // Company
+  // User
   userData: () => axiosInstance.get("/user/current-user"),
-  getCompanyData: () => axiosInstance.get("/company/own"),
-  createCompany: (companyData) => axiosInstance.post("/company/own", companyData),
-  updateCompany: (companyData) => axiosInstance.put("/company/own", companyData),
-  uploadCompanyFiles: (companyId, files, types) => {
+  getUserCompanies: () => axiosInstance.get(`/company`),
+
+  // Companies
+  getCompany: (companyId) => axiosInstance.get(`/company/${companyId}`, companyId),
+  createCompany: (companyData) => axiosInstance.post("/company", companyData),
+  updateCompany: (companyData) => axiosInstance.put(`/company/${companyData.id}`, companyData),
+
+  // Company contractors
+  getContractors: (companyId) => axiosInstance.get(`/company/${companyId}/contractor`),
+
+  // Company documents
+  uploadCompanyDocuments: (companyId, files, types) => {
     const formData = new FormData()
     files.forEach((file, index) => {
       formData.append("documents", file)
       formData.append("types", types[index])
     })
-    return axiosInstance.put(`/company/own/${companyId}/document`, formData, {
+    return axiosInstance.put(`/company/${companyId}/document`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
   },
-  getCompanyDocuments: (companyId) => axiosInstance.get(`/company/own/${companyId}/documents`),
+  getCompanyDocuments: (companyId) => axiosInstance.get(`/company/${companyId}/document`),
 
   // Contractors
-  getContractors: () => axiosInstance.get("/contractors"),
-  getContractorDetails: (id) => axiosInstance.get(`/contractors/${id}`),
-  addContractor: (contractorData) => axiosInstance.post("/contractors", contractorData),
-  getDocumentContent: (id) => axiosInstance.get(`/documents/${id}/content`),
-  getDocumentRisks: (id) => axiosInstance.get(`/documents/${id}/risks`),
-  getInteractionPossibilities: (id) => axiosInstance.get(`/contractors/${id}/possibilities`),
+  getContractor: (companyId, contractorId) => axiosInstance.get(`/company/${companyId}/contractor/${contractorId}`),
+  createContractor: (companyId, contractorData) => axiosInstance.post(`/company/${companyId}/contractor`, contractorData),
+
+  // Contractor documents
+  uploadContractorDocuments: (companyId, contractorId, files, types) => {
+    const formData = new FormData()
+    files.forEach((file, index) => {
+      formData.append("documents", file)
+      formData.append("types", types[index])
+    })
+    return axiosInstance.put(`/company/${companyId}/contractor/${contractorId}/document`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+  },
+  getContractorDocuments: (companyId, contractorId) => axiosInstance.get(`/company/${companyId}/contractor/${contractorId}/document`),
+
+  // AI functions
+  getDocumentInsights: (id) => axiosInstance.get(`/analyse/document/${id}/description`),
+  getDocumentRisks: (id) => axiosInstance.get(`/analyse/document/${id}/risks`),
+  getInteractionPossibilities: (companyId, contractorId) => axiosInstance.get(`/analyse/company/${companyId}/contractor/${contractorId}/opportunities`),
 }
 

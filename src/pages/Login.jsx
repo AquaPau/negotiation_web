@@ -14,7 +14,7 @@ const Login = () => {
     try {
       const response = await api.login({ email, password });
       login(response.data);
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
     }

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { api } from "@/api/api"
 
-const FileUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, companyId }) => {
+const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, companyId }) => {
   const [selectedFiles, setSelectedFiles] = useState([])
   const fileInputRef = useRef(null)
 
@@ -32,13 +32,13 @@ const FileUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, com
       const files = selectedFiles.map((sf) => sf.file)
       const types = selectedFiles.map((sf) => sf.type)
 
-      await api.uploadCompanyFiles(companyId, files, types)
+      await api.uploadCompanyDocuments(companyId, files, types)
       onUploadSuccess("Files uploaded successfully!")
 
       // Fetch updated file list after 3 seconds
       setTimeout(async () => {
         try {
-          const updatedFiles = await api.getCompanyFiles(companyId)
+          const updatedFiles = await api.getCompanyDocuments(companyId)
           // Handle the updated file list (e.g., update state in parent component)
           console.log("Updated files:", updatedFiles)
         } catch (error) {
@@ -108,5 +108,5 @@ const FileUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, com
   )
 }
 
-export default FileUploadDialog
+export default CompanyDocumentUploadDialog
 
