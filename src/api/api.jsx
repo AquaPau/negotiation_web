@@ -65,7 +65,7 @@ export const api = {
 
   // AI functions
   getDocumentInsights: (id) => axiosInstance.get(`/analyse/document/${id}/description`),
-  getDocumentRisks: (id) => axiosInstance.get(`/documents/${id}/risks`),
-  getInteractionPossibilities: (id) => axiosInstance.get(`/contractors/${id}/possibilities`),
+  getDocumentRisks: (id) => axiosInstance.get(`/analyse/document/${id}/risks`),
+  getInteractionPossibilities: (companyId, contractorId) => axiosInstance.get(`/analyse/company/${companyId}/contractor/${contractorId}/opportunities`),
 }
 

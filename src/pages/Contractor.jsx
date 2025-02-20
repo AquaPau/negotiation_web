@@ -48,14 +48,52 @@ const Contractor = () => {
   const analyseDocumentInsights = async (docId) => {
     try {
       api.getDocumentInsights(docId)
-      // Fetch updated file list after 3 seconds
+      // Fetch updated file list after 3 seconds and 2 minutes
       setTimeout(async () => {
-          fetchContractorDocuments()
+        fetchContractorDocuments()
       }, 3000)
-      
+      setTimeout(async () => {
+        fetchContractorDocuments()
+      }, 120000)
+
     } catch (error) {
       console.log("Failed to catch the document insights: " + docId)
     }
+  }
+
+  const analyseDocumentRisks = async (docId) => {
+    try {
+      api.getDocumentRisks(docId)
+      // Fetch updated file list after 3 seconds and 2 minutes
+      setTimeout(async () => {
+        fetchContractorDocuments()
+      }, 3000)
+      setTimeout(async () => {
+        fetchContractorDocuments()
+      }, 120000)
+    } catch (error) {
+      console.log("failed to catch document risks: " + docId)
+    }
+  }
+
+  const analyseContractorOpportunities = async() => {
+    try {
+      api.getInteractionPossibilities(params.companyId, params.contractorId)
+      // Fetch updated file list after 3 seconds and 2 minutes
+      setTimeout(async () => {
+        fetchContractorDetails()
+      }, 3000)
+      setTimeout(async () => {
+        fetchContractorDetails()
+      }, 120000)
+    } catch (error) {
+      console.log("failed to catch contractor opportunities: company - " + params.companyId + ", contractor - " + contractorId)
+    }
+  }
+
+  const defineRisksCellData = (doc) => {
+    if (doc.type != "CONTRACT") return "-"
+    return doc.risks
   }
 
   if (isLoading) {
@@ -96,6 +134,14 @@ const Contractor = () => {
             </Card>
             <Card>
               <CardHeader>
+                <CardTitle>Возможности сотрудничества с контрагентом</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {contractor.opportunities || <Button onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
                 <CardTitle>Документы</CardTitle>
               </CardHeader>
               <CardContent>
@@ -104,7 +150,9 @@ const Contractor = () => {
                     <TableRow>
                       <TableHead>ID</TableHead>
                       <TableHead>Наименование</TableHead>
+                      <TableHead>Тип документа</TableHead>
                       <TableHead>Описание содержания</TableHead>
+                      <TableHead>Риски документа</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -112,7 +160,9 @@ const Contractor = () => {
                       <TableRow key={doc.id}>
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
+                        <TableCell>{doc.type}</TableCell>
                         <TableCell>{doc.description || <Button onClick={() => analyseDocumentInsights(doc.id)}>Узнать содержимое документа</Button>}</TableCell>
+                        <TableCell>{defineRisksCellData(doc) || <Button onClick={() => analyseDocumentRisks(doc.id)}>Узнать риски договора</Button>}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
