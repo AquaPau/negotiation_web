@@ -1,29 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+"use client"
+
+import { Link } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 const Header = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuth()
 
   return (
-    <header className="bg-gray-800 text-white p-4">
-      <nav className="container mx-auto flex justify-between items-center">
-        <div>
+    <header className="bg-background border-b border-neutral-200 dark:border-neutral-800">
+      <nav className="app-container h-16 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link to="/" className="text-lg font-semibold text-foreground">
+            Legal Management System
+          </Link>
+        </div>
+        <div className="flex items-center space-x-4">
           {user ? (
             <>
-              <Link to="/" className="mr-4">Управление компаниями</Link>
-              <button onClick={logout} className="bg-red-500 px-4 py-2 rounded">Выход</button>
+              <Link to="/" className="nav-item">
+                Управление компаниями
+              </Link>
+              <button onClick={logout} className="button-secondary">
+                Выход
+              </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="mr-4">Вход</Link>
-              <Link to="/register" className="bg-blue-500 px-4 py-2 rounded">Регистрация</Link>
+              <Link to="/login" className="nav-item">
+                Вход
+              </Link>
+              <Link to="/register" className="button-primary">
+                Регистрация
+              </Link>
             </>
           )}
         </div>
       </nav>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
+
