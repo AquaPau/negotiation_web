@@ -93,6 +93,22 @@ const Company = () => {
     }
   }
 
+    const analyseDocumentInsights = async (docId) => {
+      try {
+        api.getDocumentInsights(docId)
+        // Fetch updated file list after 3 seconds and 2 minutes
+        setTimeout(async () => {
+          fetchCompanyDocuments()
+        }, 3000)
+        setTimeout(async () => {
+          fetchCompanyDocuments()
+        }, 60000)
+
+      } catch (error) {
+        console.log("Failed to catch the document insights: " + docId)
+      }
+    }
+
   const handleViewContractorsDetails = (contractorId) => {
     if (companyData && companyData.id) {
       const url = `/company/${companyData.id}/contractor/${contractorId}`
@@ -128,11 +144,10 @@ const Company = () => {
 
   return (
     <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="section-title">Панель управления</h1>
-            <Button className="mt-4" onClick={handleUpdateCompany}>Обновить данные компании</Button>
-            <Button onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-            <Button onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
+          <div className="flex items-stretch justify-end">
+            <Button className="link" onClick={handleUpdateCompany}>Обновить данные компании</Button>
+            <Button className="link" onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+            <Button className="link" onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
           </div>
       <div flex items-center justify-between>
         {companyData ? (
@@ -168,19 +183,11 @@ const Company = () => {
                       <TableRow key={doc.id}>
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
-                        <TableCell>{doc.description || "N/A"}</TableCell>
+                        <TableCell>{doc.description || <Button className="outline" onClick={() => analyseDocumentInsights(doc.id)}>Узнать содержимое документа</Button>}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-            <Card className="mt-4">
-              <CardContent>
-                {uploadMessage && (
-                  <p className={uploadMessage.includes("error") ? "text-red-500" : "text-green-500"}>{uploadMessage}</p>
-                )}
-                <Button onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
               </CardContent>
             </Card>
             <Card className="mt-4">
@@ -194,7 +201,7 @@ const Company = () => {
                       <TableRow>
                         <TableHead>ID</TableHead>
                         <TableHead>Пользовательское название контрагента</TableHead>
-                        <TableHead>Детали контрагента</TableHead>
+                        <TableHead>Детали</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -202,7 +209,7 @@ const Company = () => {
                         <TableRow key={contr.id}>
                           <TableCell>{contr.id}</TableCell>
                           <TableCell>{contr.customName}</TableCell>
-                          <TableCell><Button onClick={() => handleViewContractorsDetails(contr.id)}>Данные контрагента</Button></TableCell>
+                          <TableCell><Button className="outline" onClick={() => handleViewContractorsDetails(contr.id)}>Данные контрагента</Button></TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -214,16 +221,6 @@ const Company = () => {
                 )
                 }
               </CardContent>
-            </Card>
-            <Card>
-              <CardContent>
-                <Button onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
-              </CardContent>
-              <CreateContractorModal
-                isOpen={isCreateContractorModalOpen}
-                onClose={() => setIsCreateContractorModalOpen(false)}
-                onCreateContractor={handleCreateContractor}
-              />
             </Card>
           </>) : (
           <CardHeader>

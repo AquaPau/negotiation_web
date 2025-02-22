@@ -61,9 +61,8 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="section-title">Панель управления</h1>
-        <Button onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
+      <div className="flex items-stretch justify-end">
+        <Button className="link" onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
       </div>
 
       <Card>
@@ -87,7 +86,7 @@ const Dashboard = () => {
                       <TableCell className="table-cell">{comp.id}</TableCell>
                       <TableCell className="table-cell">{comp.customUserGeneratedName}</TableCell>
                       <TableCell className="table-cell">
-                        <Button onClick={() => handleViewCompany(comp.id)}>Данные компании</Button>
+                        <Button className="outline" onClick={() => handleViewCompany(comp.id)}>Данные компании</Button>
                       </TableCell>
                     </TableRow>
                   ))}

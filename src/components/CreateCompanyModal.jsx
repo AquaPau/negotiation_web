@@ -16,20 +16,7 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
   const [companyName, setCompanyName] = useState("")
   const [ogrn, setOgrn] = useState("")
   const [country, setCountry] = useState("RU")
-  const [userId, setUserId] = useState(null)
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await fetch("/api/user/current-user")
-        const data = await response.json()
-        setUserId(data.id)
-      } catch (error) {
-        console.error("Error fetching current user:", error)
-      }
-    }
-    fetchCurrentUser()
-  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()

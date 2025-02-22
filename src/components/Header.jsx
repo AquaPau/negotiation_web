@@ -4,13 +4,13 @@ import { Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 
 const Header = () => {
-  const { user, logout } = useAuth()
+  const { user, loading, login, logout, handleUnauthorized } = useAuth()
 
   return (
     <header className="bg-background border-b border-neutral-200 dark:border-neutral-800">
       <nav className="app-container h-16 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/" className="text-lg font-semibold text-foreground">
+          <Link to="/" className="text-center font-semibold text-foreground">
             Legal Management System
           </Link>
         </div>

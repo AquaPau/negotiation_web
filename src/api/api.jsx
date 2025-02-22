@@ -1,5 +1,6 @@
 import axios from "axios"
 
+
 const API_BASE_URL = "http://localhost:8080/api" // Replace with your actual API base URL
 
 const axiosInstance = axios.create({
@@ -11,11 +12,31 @@ const axiosInstance = axios.create({
   withCredentials: true,
 })
 
+export const setupAxiosInterceptors = (handleUnauthorized) => {
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 403) {
+        handleUnauthorized()
+      }
+      return Promise.reject(error)
+    },
+  )
+}
+
 export const api = {
   // Authentication
   login: (credentials) => axiosInstance.post("/auth/login", credentials),
   register: (userData) => axiosInstance.post("/auth/register", userData),
-  logout: () => axiosInstance.post("/auth/logout"),
+  logout: async () => {
+      try {
+        await axiosInstance.post("/auth/logout")
+      } catch (error) {
+        console.error("Logout API error:", error)
+        // Still proceed with local logout even if API call fails
+        throw error
+      }
+    },
 
   // User
   userData: () => axiosInstance.get("/user/current-user"),
