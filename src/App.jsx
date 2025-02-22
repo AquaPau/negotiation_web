@@ -10,13 +10,15 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contractor from "./pages/Contractor";
 import Company from "@/pages/Company"
+import { AxiosInterceptor } from "./components/AxiosInterceptor"
 import '@/App.css';
 
 function App() {
 
   return (
-    <AuthProvider>
       <Router>
+    <AuthProvider>
+        <AxiosInterceptor>
         <div className="min-h-screen bg-gray-100">
           <Header />
           <main className="py-4">
@@ -35,7 +37,7 @@ function App() {
                           404 - Not found. URL: {location.pathname}
                           <br />
                           <a href="/" style={{ color: "blue", textDecoration: "underline" }}>
-                            Go back to Dashboard
+                            Вернуться на главную
                           </a>
                         </div>
                       }
@@ -43,8 +45,9 @@ function App() {
             </Routes>
           </main>
         </div>
-      </Router>
+        </AxiosInterceptor>
     </AuthProvider>
+    </Router>
   );
 }
 

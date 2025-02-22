@@ -116,10 +116,9 @@ const Contractor = () => {
 
   return (
     <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h1 className="section-title">Панель управления</h1>
-                <Button onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-                <Button disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
+              <div className="flex items-stretch justify-end">
+                <Button className="link" onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+                <Button className="link" disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
               </div>
       <div flex items-center justify-between>
         {contractor ? (
@@ -166,8 +165,8 @@ const Contractor = () => {
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
                         <TableCell>{doc.type}</TableCell>
-                        <TableCell>{doc.description || <Button onClick={() => analyseDocumentInsights(doc.id)}>Узнать содержимое документа</Button>}</TableCell>
-                        <TableCell>{defineRisksCellData(doc) || <Button onClick={() => analyseDocumentRisks(doc.id)}>Узнать риски договора</Button>}</TableCell>
+                        <TableCell>{doc.description || <Button className="outline" onClick={() => analyseDocumentInsights(doc.id)}>Узнать содержимое документа</Button>}</TableCell>
+                        <TableCell>{defineRisksCellData(doc) || <Button className="outline" onClick={() => analyseDocumentRisks(doc.id)}>Узнать риски договора</Button>}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

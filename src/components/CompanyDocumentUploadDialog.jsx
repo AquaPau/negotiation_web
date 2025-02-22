@@ -60,18 +60,18 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Upload Documents</DialogTitle>
+          <DialogTitle>Загрузить документы</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <input type="file" multiple onChange={handleFileChange} className="hidden" ref={fileInputRef} />
-          <Button onClick={handleAddMoreFiles}>{selectedFiles.length > 0 ? "Add More Files" : "Select Files"}</Button>
+          <Button onClick={handleAddMoreFiles}>{selectedFiles.length > 0 ? "Добавить еще" : "Выбрать файл"}</Button>
           {selectedFiles.length > 0 && (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>File Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Action</TableHead>
+                  <TableHead>Название</TableHead>
+                  <TableHead>Тип</TableHead>
+                  <TableHead>Действие</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -81,17 +81,17 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
                     <TableCell>
                       <Select value={file.type} onValueChange={(value) => handleTypeChange(index, value)}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder="Тип документа" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="CORPORATE">CORPORATE</SelectItem>
-                          <SelectItem value="CONTRACT">CONTRACT</SelectItem>
+                          <SelectItem value="CORPORATE">КОРПОРАТИВНЫЕ ДОКУМЕНТЫ</SelectItem>
+                          <SelectItem value="OTHER">ДРУГОЕ</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
                     <TableCell>
                       <Button variant="destructive" onClick={() => handleDelete(index)}>
-                        Delete
+                        Удалить
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -100,7 +100,7 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
             </Table>
           )}
           <Button onClick={handleUpload} disabled={selectedFiles.length === 0}>
-            Upload
+            Загрузить
           </Button>
         </div>
       </DialogContent>
