@@ -127,8 +127,14 @@ const Company = () => {
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/4 bg-sidebar p-4">
+    <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="section-title">Панель управления</h1>
+            <Button className="mt-4" onClick={handleUpdateCompany}>Обновить данные компании</Button>
+            <Button onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+            <Button onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
+          </div>
+      <div flex items-center justify-between>
         {companyData ? (
           <>
             <Card>
@@ -144,9 +150,6 @@ const Company = () => {
                 {companyData.managerName && <p>ФИО исполнительного органа: {companyData.managerName}</p>}
               </CardContent>
             </Card>
-            <Button className="mt-4" onClick={handleUpdateCompany}>
-              Обновить данные компании
-            </Button>
             <Card>
               <CardHeader>
                 <CardTitle>Документы</CardTitle>

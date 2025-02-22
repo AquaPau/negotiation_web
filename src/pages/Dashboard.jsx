@@ -4,10 +4,9 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { api } from "@/api/api"
 import CreateCompanyModal from "@/components/CreateCompanyModal"
-import CreateContractorModal from "@/components/CreateContractorModal"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
 
 const Dashboard = () => {
   const [companyData, setCompanyData] = useState([])
@@ -50,66 +49,59 @@ const Dashboard = () => {
     }
   }
 
-  const handleCreateContractor = async (contractorName, ogrn, country) => {
-    try {
-      const userResponse = await api.userData()
-      const user = userResponse.data
-      const response = await api.createContractor({
-        userId: user.id,
-        customUserGeneratedName: contractorName,
-        companyId: companyData.id,
-        ogrn: ogrn,
-        region: country
-      })
-      setIsCreateContractorModalOpen(false)
-    } catch (error) {
-      console.error("Failed to create company:", error)
-    }
-  }
-
   const handleViewCompany = (id) => {
     if (companyData.length > 0) {
-      const url = `/company/${id}`
-      console.log("Navigating to:", url)
-      navigate(url)
-    } else {
-      console.error("Company data or ID is missing")
+      navigate(`/company/${id}`)
     }
   }
 
   if (isLoading) {
-    return <div className="text-center mt-8">Loading...</div>
+    return <div className="flex items-center justify-center h-[calc(100vh-4rem)]">Загрузка...</div>
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/4 bg-sidebar p-4">
-        {companyData.length > 0 ? (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle>Мои компании</CardTitle>
-              </CardHeader>
-              <CardContent>
-              <Table>
-                    <TableBody>
-                      {companyData.map((comp) => (
-                        <TableRow key={comp.id}>
-                          <TableCell>{comp.id}</TableCell>
-                          <TableCell>{comp.customUserGeneratedName}</TableCell>
-                          <TableCell><Button onClick={() => handleViewCompany(comp.id)}>Данные компании</Button></TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-              </CardContent>
-              
-            </Card>
-          </>
-        ) : (
-          <Button onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
-        )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="section-title">Панель управления</h1>
+        <Button onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Мои компании</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {companyData.length > 0 ? (
+            <div className="table-container">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Название</TableHead>
+                    <TableHead>Действия</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {companyData.map((comp) => (
+                    <TableRow key={comp.id} className="table-row">
+                      <TableCell className="table-cell">{comp.id}</TableCell>
+                      <TableCell className="table-cell">{comp.customUserGeneratedName}</TableCell>
+                      <TableCell className="table-cell">
+                        <Button onClick={() => handleViewCompany(comp.id)}>Данные компании</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-6 text-muted-foreground">
+              Нет доступных компаний. Создайте свою первую компанию.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <CreateCompanyModal
         isOpen={isCreateCompanyModalOpen}
         onClose={() => setIsCreateCompanyModalOpen(false)}
@@ -120,6 +112,8 @@ const Dashboard = () => {
 }
 
 export default Dashboard
+
+
 
 
 

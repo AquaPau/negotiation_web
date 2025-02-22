@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contractor from "./pages/Contractor";
 import Company from "@/pages/Company"
+import '@/App.css';
 
 function App() {
 

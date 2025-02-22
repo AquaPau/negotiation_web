@@ -115,8 +115,13 @@ const Contractor = () => {
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/4 bg-sidebar p-4">
+    <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h1 className="section-title">Панель управления</h1>
+                <Button onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+                <Button disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
+              </div>
+      <div flex items-center justify-between>
         {contractor ? (
           <>
             <Card>
@@ -137,7 +142,7 @@ const Contractor = () => {
                 <CardTitle>Возможности сотрудничества с контрагентом</CardTitle>
               </CardHeader>
               <CardContent>
-                {contractor.opportunities || <Button onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>}
+                {contractor.opportunities || "N/A"}
               </CardContent>
             </Card>
             <Card>
@@ -167,14 +172,6 @@ const Contractor = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-            <Card className="mt-4">
-              <CardContent>
-                {uploadMessage && (
-                  <p className={uploadMessage.includes("error") ? "text-red-500" : "text-green-500"}>{uploadMessage}</p>
-                )}
-                <Button onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
               </CardContent>
             </Card>
           </>
