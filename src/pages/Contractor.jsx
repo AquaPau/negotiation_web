@@ -117,8 +117,8 @@ const Contractor = () => {
   return (
     <div className="space-y-6">
               <div className="flex items-stretch justify-end">
-                <Button className="link" onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-                <Button className="link" disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
+                <Button className="link bg-stone-300" onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+                <Button className="link bg-stone-300" disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
               </div>
       <div flex items-center justify-between>
         {contractor ? (

@@ -145,9 +145,9 @@ const Company = () => {
   return (
     <div className="space-y-6">
           <div className="flex items-stretch justify-end">
-            <Button className="link" onClick={handleUpdateCompany}>Обновить данные компании</Button>
-            <Button className="link" onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-            <Button className="link" onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
+            <Button className="link bg-stone-300" onClick={handleUpdateCompany}>Обновить данные компании</Button>
+            <Button className="link bg-stone-300" onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
+            <Button className="link bg-stone-300" onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
           </div>
       <div flex items-center justify-between>
         {companyData ? (

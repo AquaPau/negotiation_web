@@ -7,11 +7,11 @@ const Header = () => {
   const { user, loading, login, logout, handleUnauthorized } = useAuth()
 
   return (
-    <header className="bg-background border-b border-neutral-200 dark:border-neutral-800">
+    <header className="bg-background border-b bg-stone-200 dark:border-bg-stone-500">
       <nav className="app-container h-16 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/" className="text-center font-semibold text-foreground">
-            Legal Management System
+                 Legal Management System
           </Link>
         </div>
         <div className="flex items-center space-x-4">

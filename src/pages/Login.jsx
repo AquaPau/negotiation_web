@@ -37,7 +37,7 @@ const Login = () => {
               type="email"
               autoComplete="email"
               required
-              className="input-field w-full"
+              className="input-field w-full bg-stone-200 rounded-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -52,12 +52,12 @@ const Login = () => {
               type="password"
               autoComplete="current-password"
               required
-              className="input-field w-full"
+              className="input-field w-full bg-stone-200 rounded-sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button type="submit" className="button-primary w-full">
+          <button type="submit" className="button-primary w-full bg-stone-500 rounded-sm">
             Войти
           </button>
         </form>
