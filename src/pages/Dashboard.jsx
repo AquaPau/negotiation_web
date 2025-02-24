@@ -62,7 +62,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-stretch justify-end">
-        <Button className="link" onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
+        <Button className="link bg-stone-300" onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
       </div>
 
       <Card>
