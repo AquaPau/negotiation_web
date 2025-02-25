@@ -41,6 +41,7 @@ jobs:
 
   docker:
     name: Build and Push Docker Image
+    environment: prod
     needs: build
     runs-on: ubuntu-latest
 
