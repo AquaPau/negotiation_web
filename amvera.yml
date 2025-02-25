@@ -5,6 +5,7 @@ meta:
     name: npm
     version: "22"
 build:
+  additionalCommands: npm install
   skip: false
   artifacts:
     "*": /
