@@ -12,7 +12,7 @@ export default defineConfig({
       },
   },
   server: {
-      allowedHosts: [negotiation-app-web-aquapau.amvera.io],
+      allowedHosts: ["negotiation-app-web-aquapau.amvera.io"],
       watch: {
         usePolling: true,
       },
