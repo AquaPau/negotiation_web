@@ -80,10 +80,9 @@ const Company = () => {
     try {
       const userResponse = await api.userData()
       const user = userResponse.data
-      const response = await api.createContractor({
+      const response = await api.createContractor(params.companyId, {
         userId: user.id,
         customUserGeneratedName: contractorName,
-        companyId: companyData.id,
         ogrn: ogrn,
         region: country
       })
@@ -237,6 +236,11 @@ const Company = () => {
           onUploadError={handleUploadError}
           companyId={companyData?.id}
         />
+      <CreateContractorModal
+        isOpen={isCreateContractorModalOpen}
+        onClose={() => setIsCreateContractorModalOpen(false)}
+        onCreateContractor={handleCreateContractor}
+      />
       </div>
 
     </div>
