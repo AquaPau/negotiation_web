@@ -113,12 +113,12 @@ const Contractor = () => {
   const handleUploadError = (message) => {
     setUploadMessage(message)
   }
-
+//<Button className="link bg-stone-300" disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
   return (
     <div className="space-y-6">
               <div className="flex items-stretch justify-end">
                 <Button className="link bg-stone-300" onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-                <Button className="link bg-stone-300" disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
+                <Button className="link bg-stone-300" disabled onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
               </div>
       <div flex items-center justify-between>
         {contractor ? (

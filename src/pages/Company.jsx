@@ -87,6 +87,12 @@ const Company = () => {
         region: country
       })
       setIsCreateContractorModalOpen(false)
+      setTimeout(async () => {
+        fetchCompanyContractors()
+      }, 3000)
+      setTimeout(async () => {
+        fetchCompanyContractors()
+      }, 120000)
     } catch (error) {
       console.error("Failed to create company:", error)
     }
