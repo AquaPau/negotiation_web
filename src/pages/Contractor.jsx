@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { api } from "@/api/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +16,7 @@ const Contractor = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isContractorDocumentUploadDialogOpen, setIsContractorDocumentUploadDialogOpen] = useState(false)
   const [uploadMessage, setUploadMessage] = useState("")
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (params.companyId && params.contractorId) {
@@ -36,6 +37,15 @@ const Contractor = () => {
     }
   }
 
+  const handleDeleteContractor = async () => {
+    try {
+      await api.deleteContractor(params.companyId, params.contractorId)
+      navigate(`/company/${params.companyId}`)
+    } catch (error) {
+      console.error("Failed to delete company:", error)
+    }
+  }
+
   const fetchContractorDocuments = async () => {
     try {
       const response = await api.getContractorDocuments(params.companyId, params.contractorId)
@@ -45,63 +55,21 @@ const Contractor = () => {
     }
   }
 
-  const analyseDocumentInsights = async (docId) => {
-    try {
-      api.getDocumentInsights(docId)
-      // Fetch updated file list after 3 seconds and 2 minutes
-      setTimeout(async () => {
-        fetchContractorDocuments()
-      }, 3000)
-      setTimeout(async () => {
-        fetchContractorDocuments()
-      }, 120000)
-
-    } catch (error) {
-      console.log("Failed to catch the document insights: " + docId)
-    }
-  }
-
-  const analyseDocumentRisks = async (docId) => {
-    try {
-      api.getDocumentRisks(docId)
-      // Fetch updated file list after 3 seconds and 2 minutes
-      setTimeout(async () => {
-        fetchContractorDocuments()
-      }, 3000)
-      setTimeout(async () => {
-        fetchContractorDocuments()
-      }, 120000)
-    } catch (error) {
-      console.log("failed to catch document risks: " + docId)
-    }
-  }
-
-  const analyseContractorOpportunities = async() => {
-    try {
-      api.getInteractionPossibilities(params.companyId, params.contractorId)
-      // Fetch updated file list after 3 seconds and 2 minutes
-      setTimeout(async () => {
-        fetchContractorDetails()
-      }, 3000)
-      setTimeout(async () => {
-        fetchContractorDetails()
-      }, 120000)
-    } catch (error) {
-      console.log("failed to catch contractor opportunities: company - " + params.companyId + ", contractor - " + contractorId)
-    }
-  }
-
-  const defineRisksCellData = (doc) => {
-    if (doc.type != "CONTRACT") return "-"
-    return doc.risks
-  }
-
   if (isLoading) {
     return <div className="text-center mt-8">Loading contractor details...</div>
   }
 
   if (!contractor) {
     return <div className="text-center mt-8">Contractor not found</div>
+  }
+
+  const handleViewContractorDocumentDetails = (documentId) => {
+    if (params.companyId && params.contractorId) {
+      const url = `/company/${params.companyId}/contractor/${params.contractorId}/document/${documentId}`
+      navigate(url)
+    } else {
+      console.error("Contractor data about document or ID is missing")
+    }
   }
 
   const handleUploadSuccess = (message) => {
@@ -113,10 +81,11 @@ const Contractor = () => {
   const handleUploadError = (message) => {
     setUploadMessage(message)
   }
-//<Button className="link bg-stone-300" disabled={contractor.opportunities} onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
+
   return (
     <div className="space-y-6">
               <div className="flex items-stretch justify-end">
+                <Button className="link bg-stone-300" onClick={handleDeleteContractor}>Удалить контрагента</Button>
                 <Button className="link bg-stone-300" onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
                 <Button className="link bg-stone-300" disabled onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
               </div>
@@ -138,14 +107,6 @@ const Contractor = () => {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Возможности сотрудничества с контрагентом</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {contractor.opportunities || "N/A"}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
                 <CardTitle>Документы</CardTitle>
               </CardHeader>
               <CardContent>
@@ -155,8 +116,7 @@ const Contractor = () => {
                       <TableHead>ID</TableHead>
                       <TableHead>Наименование</TableHead>
                       <TableHead>Тип документа</TableHead>
-                      <TableHead>Описание содержания</TableHead>
-                      <TableHead>Риски документа</TableHead>
+                      <TableHead>Детали</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -165,9 +125,8 @@ const Contractor = () => {
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
                         <TableCell>{doc.type}</TableCell>
-                        <TableCell>{doc.description || <Button className="outline" onClick={() => analyseDocumentInsights(doc.id)}>Узнать содержимое документа</Button>}</TableCell>
-                        <TableCell>{defineRisksCellData(doc) || <Button className="outline" onClick={() => analyseDocumentRisks(doc.id)}>Узнать риски договора</Button>}</TableCell>
-                      </TableRow>
+                        <TableCell><Button className="outline" onClick={() => handleViewContractorDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
+                        </TableRow>
                     ))}
                   </TableBody>
                 </Table>

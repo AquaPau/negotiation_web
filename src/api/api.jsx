@@ -40,15 +40,12 @@ export const api = {
 
   // User
   userData: () => axiosInstance.get("/user/current-user"),
-  getUserCompanies: () => axiosInstance.get(`/company`),
 
   // Companies
-  getCompany: (companyId) => axiosInstance.get(`/company/${companyId}`, companyId),
+  getUserCompanies: () => axiosInstance.get(`/company`),
+  getCompany: (companyId) => axiosInstance.get(`/company/${companyId}`),
   createCompany: (companyData) => axiosInstance.post("/company", companyData),
-  updateCompany: (companyData) => axiosInstance.put(`/company/${companyData.id}`, companyData),
-
-  // Company contractors
-  getContractors: (companyId) => axiosInstance.get(`/company/${companyId}/contractor`),
+  deleteCompany: (companyData) => axiosInstance.delete(`/company/${companyData.id}`),
 
   // Company documents
   uploadCompanyDocuments: (companyId, files, types) => {
@@ -64,10 +61,15 @@ export const api = {
     })
   },
   getCompanyDocuments: (companyId) => axiosInstance.get(`/company/${companyId}/document`),
+  getCompanyDocument: (companyId, documentId) => axiosInstance.get(`/company/${companyId}/document/${documentId}`),
+  deleteCompanyDocument: (companyId, documentId) => axiosInstance.delete(`/company/${companyId}/document/${documentId}`),
+  deleteCompanyDocuments: (companyId) => axiosInstance.delete(`/company/${companyId}/document`),
 
-  // Contractors
+  // Company contractors
+  getContractors: (companyId) => axiosInstance.get(`/company/${companyId}/contractor`),
   getContractor: (companyId, contractorId) => axiosInstance.get(`/company/${companyId}/contractor/${contractorId}`),
   createContractor: (companyId, contractorData) => axiosInstance.post(`/company/${companyId}/contractor`, contractorData),
+  deleteContractor: (companyId, contractorId) => axiosInstance.delete(`/company/${companyId}/contractor/${contractorId}`),
 
   // Contractor documents
   uploadContractorDocuments: (companyId, contractorId, files, types) => {
@@ -83,10 +85,41 @@ export const api = {
     })
   },
   getContractorDocuments: (companyId, contractorId) => axiosInstance.get(`/company/${companyId}/contractor/${contractorId}/document`),
+  getContractorDocument: (companyId, contractorId, documentId) => axiosInstance.get(`/company/${companyId}/contractor/${contractorId}/document/${documentId}`),
+  deleteContractorDocument: (companyId, contractorId, documentId) => axiosInstance.delete(`/company/${companyId}/contractor/${contractorId}/document/${documentId}`),
+  deleteContractorDocuments: (companyId, contractorId) => axiosInstance.delete(`/company/${companyId}/contractor/${contractorId}/document`),
+
+  // Projects
+  getUserProjects: () => axiosInstance.get(`/project`),
+  createProject: (projectData) => axiosInstance.post(`/project`, projectData),
+  getProject: (projectId) => axiosInstance.get(`/project/${projectId}`),
+  deleteProject: (projectId) => axiosInstance.delete(`/project/${projectId}`),
+
+  // Project documents
+  uploadProjectDocuments: (projectId, files, types) => {
+        const formData = new FormData()
+        files.forEach((file, index) => {
+          formData.append("documents", file)
+          formData.append("types", types[index])
+        })
+        return axiosInstance.put(`/project/${projectId}/document`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+      },
+  getProjectDocuments: (projectId) => axiosInstance.get(`/project/${projectId}/document`),
+  getProjectDocument: (projectId, documentId) => axiosInstance.get(`/project/${projectId}/document/${documentId}`),
+  deleteProjectDocument: (projectId, documentId) => axiosInstance.delete(`/project/${projectId}/document/${documentId}`),
+  deleteProjectDocuments: (projectId) => axiosInstance.delete(`/project/${projectId}/document`),
+
+  //Task status
+  getTaskStatus: (id) => axiosInstance.get(`/task/${id}`),
 
   // AI functions
-  getDocumentInsights: (id) => axiosInstance.get(`/analyse/document/${id}/description`),
-  getDocumentRisks: (id) => axiosInstance.get(`/analyse/document/${id}/risks`),
-  getInteractionPossibilities: (companyId, contractorId) => axiosInstance.get(`/analyse/company/${companyId}/contractor/${contractorId}/opportunities`),
+  getDocumentDescription: (id, retry) => axiosInstance.get(`/analyse/document/${id}/description?retry=${retry}`),
+  getDocumentRisks: (id, retry) => axiosInstance.get(`/analyse/document/${id}/risks?retry=${retry}`),
+  getProjectResolution: (id, retry) => axiosInstance.get(`/analyse/project/${id}/resolution?retry=${retry}`),
+
 }
 
