@@ -9,6 +9,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contractor from "./pages/Contractor";
 import Company from "@/pages/Company"
+import CompanyDocument from "@/pages/CompanyDocument"
+import ContractorDocument from "@/pages/ContractorDocument"
 import { AxiosInterceptor } from "./components/AxiosInterceptor"
 import '@/App.css';
 
@@ -28,6 +30,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/company/:companyId" element={<Company />} />
               <Route path="/company/:companyId/contractor/:contractorId" element={<Contractor />} />
+              <Route path="/company/:companyId/document/:documentId" element={<CompanyDocument />} />
+              <Route path="/company/:companyId/contractor/:contractorId/document/:documentId" element={<ContractorDocument />} />
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route
                       path="*"

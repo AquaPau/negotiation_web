@@ -117,19 +117,27 @@ const Company = () => {
   const handleViewContractorsDetails = (contractorId) => {
     if (companyData && companyData.id) {
       const url = `/company/${companyData.id}/contractor/${contractorId}`
-      console.log("Navigating to:", url)
       navigate(url)
     } else {
       console.error("Company data about contractor or ID is missing")
     }
   }
 
-  const handleUpdateCompany = async () => {
+  const handleViewCompanyDocumentDetails = (documentId) => {
+    if (companyData && companyData.id) {
+      const url = `/company/${companyData.id}/document/${documentId}`
+      navigate(url)
+    } else {
+      console.error("Company data about document or ID is missing")
+    }
+  }
+
+  const handleDeleteCompany = async () => {
     try {
-      await api.updateCompany(companyData)
-      await fetchUserCompany()
+      await api.deleteCompany(companyData)
+      navigate(`/`)
     } catch (error) {
-      console.error("Failed to update company:", error)
+      console.error("Failed to delete company:", error)
     }
   }
 
@@ -150,7 +158,7 @@ const Company = () => {
   return (
     <div className="space-y-6">
           <div className="flex items-stretch justify-end">
-            <Button className="link bg-stone-300" disabled onClick={handleUpdateCompany}>Обновить данные компании</Button>
+            <Button className="link bg-stone-300" onClick={handleDeleteCompany}>Удалить компанию</Button>
             <Button className="link bg-stone-300" onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
             <Button className="link bg-stone-300" onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
           </div>
@@ -180,7 +188,7 @@ const Company = () => {
                     <TableRow>
                       <TableHead>ID</TableHead>
                       <TableHead>Наименование</TableHead>
-                      <TableHead>Описание содержания</TableHead>
+                      <TableHead>Детали</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -188,7 +196,7 @@ const Company = () => {
                       <TableRow key={doc.id}>
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
-                        <TableCell>{doc.description || <Button className="outline" onClick={() => analyseDocumentInsights(doc.id)}>Узнать содержимое документа</Button>}</TableCell>
+                        <TableCell><Button className="outline" onClick={() => handleViewCompanyDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
