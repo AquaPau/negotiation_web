@@ -6,12 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-const countries = [
-  { code: "RU", name: "Russia" },
-  { code: "BY", name: "Belarus" },
-  { code: "KZ", name: "Kazakhstan" }
-]
-
 const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
   const [companyName, setCompanyName] = useState("")
   const [ogrn, setOgrn] = useState("")
@@ -51,11 +45,9 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
                 <SelectValue placeholder="Select a country" />
               </SelectTrigger>
               <SelectContent>
-                {countries.map((c) => (
-                  <SelectItem key={c.code} value={c.code}>
-                    {c.name}
-                  </SelectItem>
-                ))}
+                <SelectItem value="RU">Российская Федерация</SelectItem>
+                <SelectItem value="BY">Республика Беларусь</SelectItem>
+                <SelectItem value="KZ">Казахстан</SelectItem>
               </SelectContent>
             </Select>
           </div>
