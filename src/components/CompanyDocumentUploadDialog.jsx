@@ -84,8 +84,13 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
                           <SelectValue placeholder="Тип документа" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="CORPORATE">КОРПОРАТИВНЫЕ ДОКУМЕНТЫ</SelectItem>
-                          <SelectItem value="OTHER">ДРУГОЕ</SelectItem>
+                          <SelectItem value="LABOR_CONTRACT">ТРУДОВОЙ ДОГОВОР</SelectItem>
+                          <SelectItem value="REAL_ESTATE_LEASE_CONTRACT">ДОГОВОР АРЕНДЫ НЕДВИЖИМОСТИ</SelectItem>
+                          <SelectItem value="SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ</SelectItem>
+                          <SelectItem value="REAL_ESTATE_SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ НЕДВИЖИМОСТИ</SelectItem>
+                          <SelectItem value="SERVICE_CONTRACT">ДОГОВОР УСЛУГ/РАБОТ</SelectItem>
+                          <SelectItem value="LICENSE_CONTRACT">ЛИЦЕНЗИОННЫЙ ДОГОВОР</SelectItem>
+                          <SelectItem value="DEFAULT">ДРУГОЕ</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>

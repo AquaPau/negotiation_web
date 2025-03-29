@@ -72,6 +72,25 @@ const Contractor = () => {
     }
   }
 
+  const defineCompanyResidence = (code) => {
+    const answer = code == "RU" ?  "Российская Федерация"
+    : code == "KZ" ?  "Казахстан"
+    : code == "BY" ? "Республика Беларусь"
+    : "Другая"
+    return answer
+  }
+
+  const defineDocTypeName = (name) => {
+    const answer = name == "LABOR_CONTRACT" ?  "Трудовой договор"
+        : name == "REAL_ESTATE_LEASE_CONTRACT" ?  "Договор аренды недвижимости"
+        : name == "SALES_CONTRACT" ? "Договор купли-продажи"
+        : name == "REAL_ESTATE_SALES_CONTRACT" ? "Договор купли-продажи недвижимости"
+        : name == "SERVICE_CONTRACT" ? "Договор услуг/работ"
+        : name == "LICENSE_CONTRACT" ? "Лицензионный договор"
+        : "Другое"
+        return answer
+  }
+
   const handleUploadSuccess = (message) => {
     setUploadMessage(message)
     setIsContractorDocumentUploadDialogOpen(false)
@@ -87,7 +106,6 @@ const Contractor = () => {
               <div className="flex items-stretch justify-end">
                 <Button className="link bg-stone-300" onClick={handleDeleteContractor}>Удалить контрагента</Button>
                 <Button className="link bg-stone-300" onClick={() => setIsContractorDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-                <Button className="link bg-stone-300" disabled onClick={() => analyseContractorOpportunities()}>Узнать возможности</Button>
               </div>
       <div flex items-center justify-between>
         {contractor ? (
@@ -97,7 +115,7 @@ const Contractor = () => {
                 <CardTitle>{contractor.customUserGeneratedName}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Страна регистрации: {contractor.residence}</p>
+                <p>Страна регистрации: {defineCompanyResidence(contractor.residence)}</p>
                 {contractor.fullName && <p>Наименование: {contractor.fullName}</p>}
                 {contractor.inn && contractor.inn !== "null" && <p>ИНН: {contractor.inn}</p>}
                 {contractor.ogrn && contractor.ogrn !== "null" && <p>ОГРН: {contractor.ogrn}</p>}
@@ -124,7 +142,7 @@ const Contractor = () => {
                       <TableRow key={doc.id}>
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
-                        <TableCell>{doc.type}</TableCell>
+                        <TableCell>{defineDocTypeName(doc.type)}</TableCell>
                         <TableCell><Button className="outline" onClick={() => handleViewContractorDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
                         </TableRow>
                     ))}

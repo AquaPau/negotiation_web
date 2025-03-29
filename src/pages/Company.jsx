@@ -147,6 +147,25 @@ const Company = () => {
     fetchCompanyDocuments()
   }
 
+  const defineCompanyResidence = (code) => {
+    const answer = code == "RU" ?  "Российская Федерация"
+    : code == "KZ" ?  "Казахстан"
+    : code == "BY" ? "Республика Беларусь"
+    : "Другая"
+    return answer
+  }
+
+  const defineDocTypeName = (name) => {
+    const answer = name == "LABOR_CONTRACT" ?  "Трудовой договор"
+        : name == "REAL_ESTATE_LEASE_CONTRACT" ?  "Договор аренды недвижимости"
+        : name == "SALES_CONTRACT" ? "Договор купли-продажи"
+        : name == "REAL_ESTATE_SALES_CONTRACT" ? "Договор купли-продажи недвижимости"
+        : name == "SERVICE_CONTRACT" ? "Договор услуг/работ"
+        : name == "LICENSE_CONTRACT" ? "Лицензионный договор"
+        : "Другое"
+        return answer
+  }
+
   const handleUploadError = (message) => {
     setUploadMessage(message)
   }
@@ -170,7 +189,7 @@ const Company = () => {
                 <CardTitle>{companyData.customUserGeneratedName}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Страна регистрации: {companyData.residence}</p>
+                <p>Страна регистрации: {defineCompanyResidence(companyData.residence)}</p>
                 {companyData.fullName && <p>Наименование: {companyData.fullName}</p>}
                 {companyData.inn && companyData.inn !== "null" && <p>ИНН: {companyData.inn}</p>}
                 {companyData.ogrn && companyData.ogrn !== "null" && <p>ОГРН: {companyData.ogrn}</p>}
@@ -196,6 +215,7 @@ const Company = () => {
                       <TableRow key={doc.id}>
                         <TableCell>{doc.id}</TableCell>
                         <TableCell>{doc.name}</TableCell>
+                        <TableCell>{defineDocTypeName(doc.type)}</TableCell>
                         <TableCell><Button className="outline" onClick={() => handleViewCompanyDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
                       </TableRow>
                     ))}
