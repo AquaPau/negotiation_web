@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Contractor from "./pages/Contractor";
+import Project from "@/pages/Project"
 import Company from "@/pages/Company"
 import CompanyDocument from "@/pages/CompanyDocument"
 import ContractorDocument from "@/pages/ContractorDocument"
@@ -32,6 +33,7 @@ function App() {
               <Route path="/company/:companyId/contractor/:contractorId" element={<Contractor />} />
               <Route path="/company/:companyId/document/:documentId" element={<CompanyDocument />} />
               <Route path="/company/:companyId/contractor/:contractorId/document/:documentId" element={<ContractorDocument />} />
+              <Route path="/project/:projectId" element={<Project />} />
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route
                       path="*"

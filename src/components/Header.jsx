@@ -11,7 +11,7 @@ const Header = () => {
       <nav className="app-container h-16 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/" className="text-center font-semibold text-foreground">
-                 Legal Management System
+                 Legentum: подготовка к переговорам по юридическим документам
           </Link>
         </div>
         <div className="flex items-center space-x-4">
@@ -19,6 +19,9 @@ const Header = () => {
             <>
               <Link to="/" className="nav-item">
                 Управление компаниями
+              </Link>
+              <Link to="/" className="nav-item">
+                Управление проектами
               </Link>
               <button onClick={logout} className="button-secondary">
                 Выход
