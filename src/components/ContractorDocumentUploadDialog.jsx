@@ -1,11 +1,49 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {Dialog, DialogContent, DialogTitle, DialogActions, Modal} from "@mui/material"
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import { styled } from '@mui/material/styles';
+import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from '@mui/icons-material/Close';
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
 import { api } from "@/api/api"
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  shadow: '6px solid #000',
+  boxShadow: 24,
+  pt: 2,
+  px: 4,
+  pb: 3,
+};
 
 const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, companyId, contractorId }) => {
   const [selectedFiles, setSelectedFiles] = useState([])
@@ -57,59 +95,95 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+    <Modal maxWidth="md" open={isOpen} onOpenChange={onClose}>
+      <Box sx={{ ...style}}>
+        <div className="flex justify-between">
           <DialogTitle>Загрузить документы</DialogTitle>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <input type="file" multiple onChange={handleFileChange} className="hidden" ref={fileInputRef} />
-          <Button onClick={handleAddMoreFiles}>{selectedFiles.length > 0 ? "Добавить еще" : "Выбрать файл"}</Button>
-          {selectedFiles.length > 0 && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Название</TableHead>
-                  <TableHead>Тип</TableHead>
-                  <TableHead>Действие</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedFiles.map((file, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{file.file.name}</TableCell>
-                    <TableCell>
-                      <Select value={file.type} onValueChange={(value) => handleTypeChange(index, value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Тип документа" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="LABOR_CONTRACT">ТРУДОВОЙ ДОГОВОР</SelectItem>
-                          <SelectItem value="REAL_ESTATE_LEASE_CONTRACT">ДОГОВОР АРЕНДЫ НЕДВИЖИМОСТИ</SelectItem>
-                          <SelectItem value="SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ</SelectItem>
-                          <SelectItem value="REAL_ESTATE_SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ НЕДВИЖИМОСТИ</SelectItem>
-                          <SelectItem value="SERVICE_CONTRACT">ДОГОВОР УСЛУГ/РАБОТ</SelectItem>
-                          <SelectItem value="LICENSE_CONTRACT">ЛИЦЕНЗИОННЫЙ ДОГОВОР</SelectItem>
-                          <SelectItem value="DEFAULT">ДРУГОЕ</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="destructive" onClick={() => handleDelete(index)}>
-                        Удалить
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-          <Button onClick={handleUpload} disabled={selectedFiles.length === 0}>
+          <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={(theme) => ({
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: theme.palette.grey[500],
+              })}
+          >
+            <CloseIcon />
+          </IconButton>
+        </div>
+        <DialogContent>
+          <div className="grid gap-4 py-4">
+            <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+                onClick={handleAddMoreFiles}
+            >
+              {selectedFiles.length > 0 ? "Добавить еще" : "Выбрать файл"}
+              <VisuallyHiddenInput
+                  ref={fileInputRef}
+                  type="file"
+                  id="files"
+                  multiple
+                  onChange={handleFileChange}
+              />
+            </Button>
+            {selectedFiles.length > 0 && (
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Название</TableCell>
+                      <TableCell>Тип</TableCell>
+                      <TableCell>Действие</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedFiles.map((file, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{file.file.name}</TableCell>
+                          <TableCell>
+                            <FormControl variant="standard" className="input-field w-full">
+                              <InputLabel id="" className="block text-sm font-medium text-gray-700">Тип документа</InputLabel>
+                              <Select
+                                  labelId="demo-simple-select-standard-label"
+                                  id="demo-simple-select-standard"
+                                  value={file.type}
+                                  onChange={(value) => handleTypeChange(index, value)}
+                                  label="Тип документа"
+                              >
+                                <MenuItem value="LABOR_CONTRACT">ТРУДОВОЙ ДОГОВОР</MenuItem>
+                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT">ДОГОВОР АРЕНДЫ НЕДВИЖИМОСТИ</MenuItem>
+                                <MenuItem value="SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ</MenuItem>
+                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ НЕДВИЖИМОСТИ</MenuItem>
+                                <MenuItem value="SERVICE_CONTRACT">ДОГОВОР УСЛУГ/РАБОТ</MenuItem>
+                                <MenuItem value="LICENSE_CONTRACT">ЛИЦЕНЗИОННЫЙ ДОГОВОР</MenuItem>
+                                <MenuItem value="DEFAULT">ДРУГОЕ</MenuItem>
+                              </Select>
+                            </FormControl>
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="destructive" onClick={() => handleDelete(index)}>
+                              Удалить
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" className="button-primary" onClick={handleUpload} disabled={selectedFiles.length === 0}>
             Загрузить
           </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogActions>
+      </Box>
+
+    </Modal>
   )
 }
 

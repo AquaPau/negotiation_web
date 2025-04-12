@@ -1,11 +1,30 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {DialogContent, DialogTitle, DialogActions, Modal} from "@mui/material"
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  shadow: '6px solid #000',
+  boxShadow: 24,
+  pt: 2,
+  px: 4,
+  pb: 3,
+};
 const countries = [
   { code: "RU", name: "Russia" },
   { code: "BY", name: "Belarus" },
@@ -23,42 +42,90 @@ const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Modal maxWidth="md" open={isOpen} onOpenChange={onClose}>
+      <Box sx={{ ...style}}>
+        <div className="flex justify-between">
+          <DialogTitle>Создать контрагента</DialogTitle>
+          <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={(theme) => ({
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: theme.palette.grey[500],
+              })}
+          >
+            <CloseIcon />
+          </IconButton>
+        </div>
+      </Box>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Новый контрагент</DialogTitle>
-        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Input
-              id="customName"
-              value={customName}
-              onChange={(e) => setCustomName(e.target.value)}
-              placeholder="Пользовательское имя контрагента"
-              required
+            <TextField
+                id="companyName"
+                required
+                className="input-field w-full"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                label="Пользовательское имя контрагента"
+                variant="standard"
             />
           </div>
           <div>
-            <Input id="ogrn" value={ogrn} onChange={(e) => setOgrn(e.target.value)} placeholder="ОГРН" required />
+            <TextField
+                id="ogrn"
+                required
+                className="input-field w-full"
+                value={ogrn}
+                onChange={(e) => setOgrn(e.target.value)}
+                label="ОГРН"
+                variant="standard"
+            />
           </div>
           <div>
-            <Select value={country} onValueChange={setCountry}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a country" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {countries.map((c) => (
-                              <SelectItem key={c.code} value={c.code}>
-                                {c.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+            <FormControl variant="standard" className="input-field w-full">
+              <InputLabel id="country-label" className="block text-sm font-medium text-gray-700">Страна регистрации</InputLabel>
+              <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  label="Select a country"
+              >
+                <MenuItem value="RU">
+                  Российская Федерация
+                </MenuItem>
+                <MenuItem value="BY">
+                  Республика Беларусь
+                </MenuItem>
+                <MenuItem value="KZ">
+                  Казахстан
+                </MenuItem>
+              </Select>
+            </FormControl>
           </div>
-          <Button type="submit">Создать</Button>
+          <DialogActions>
+            <Button
+                variant="contained"
+                type="submit"
+                className="button-primary"
+            >
+              Создать контрагента
+            </Button>
+            <Button
+                variant="outlined"
+                type="submit"
+                onClick={onClose}
+                className="button-primary"
+            >
+              Отменить
+            </Button>
+          </DialogActions>
         </form>
       </DialogContent>
-    </Dialog>
+    </Modal>
   )
 }
 

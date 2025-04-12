@@ -5,9 +5,20 @@ import { useNavigate } from "react-router-dom"
 import { api } from "@/api/api"
 import CreateCompanyModal from "@/components/CreateCompanyModal"
 import CreateProjectModal from "@/components/CreateProjectModal"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const Dashboard = () => {
   const [companyData, setCompanyData] = useState([])
@@ -100,80 +111,112 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-stretch justify-end">
-        <Button className="link bg-stone-300" onClick={() => setIsCreateCompanyModalOpen(true)}>Создать новую компанию</Button>
-        <Button className="link bg-stone-300" onClick={() => setIsCreateProjectModalOpen(true)}>Создать новый проект</Button>
+        <Button
+            variant="contained"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary"
+            onClick={() => setIsCreateCompanyModalOpen(true)}
+        >
+          Создать новую компанию
+        </Button>
+        <Button
+            variant="contained"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary"
+            onClick={() => setIsCreateProjectModalOpen(true)}
+        >
+          Создать новый проект
+        </Button>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Мои компании</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {companyData.length > 0 ? (
-            <div className="table-container">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Название</TableHead>
-                    <TableHead>Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {companyData.map((comp) => (
-                    <TableRow key={comp.id} className="table-row">
-                      <TableCell className="table-cell">{comp.id}</TableCell>
-                      <TableCell className="table-cell">{comp.customUserGeneratedName}</TableCell>
-                      <TableCell className="table-cell">
-                        <Button className="outline" onClick={() => handleViewCompany(comp.id)}>Данные компании</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-6 text-muted-foreground">
-              Нет доступных компаний. Создайте свою первую компанию.
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <Container className="flex items-center justify-center w-full  mt-10 mb-10">
+        <Card>
+          <CardHeader>
+            <Typography variant="h2"  title=" Мои компании">
+              Мои компании
+            </Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="h3" className="mb-10"  title=" Мои компании">
+              Мои компании
+            </Typography>
+            {companyData.length > 0 ? (
+                <TableContainer component={Paper} className="mt-10">
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>ID</TableCell>
+                        <TableCell>Название</TableCell>
+                        <TableCell>Действия</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {companyData.map((comp) => (
+                          <TableRow key={comp.id} className="table-row">
+                            <TableCell className="table-cell">{comp.id}</TableCell>
+                            <TableCell className="table-cell">{comp.customUserGeneratedName}</TableCell>
+                            <TableCell className="table-cell">
+                              <Button className="outline" onClick={() => handleViewCompany(comp.id)}>Данные компании</Button>
+                            </TableCell>
+                          </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+            ) : (
+                <Typography variant="body2" sx={{ color: 'text.secondary' }} className="text-center py-6 text-muted-foreground">
+                  Нет доступных компаний. Создайте свою первую компанию.
+                </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Container>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Мои проекты</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {projectData.length > 0 ? (
-            <div className="table-container">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Название</TableHead>
-                    <TableHead>Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {projectData.map((proj) => (
-                    <TableRow key={proj.id} className="table-row">
-                      <TableCell className="table-cell">{proj.id}</TableCell>
-                      <TableCell className="table-cell">{proj.customUserGeneratedName}</TableCell>
-                      <TableCell className="table-cell">
-                        <Button className="outline" onClick={() => handleViewProject(proj.id)}>Данные проекта</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-6 text-muted-foreground">
-              Нет доступных проектов. Создайте свой первый проект.
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+      <Container className="flex items-center justify-center w-full  mt-10">
+        <Card>
+          <CardHeader>
+            <Typography variant="h2"  title=" Мои проекты">
+              Мои проекты
+            </Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="h3" className="mb-10"  title=" Мои проекты">
+              Мои проекты
+            </Typography>
+            {projectData.length > 0 ? (
+                <TableContainer component={Paper} className="mt-10">
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>ID</TableCell>
+                        <TableCell>Название</TableCell>
+                        <TableCell>Действия</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {projectData.map((proj) => (
+                          <TableRow key={proj.id} className="table-row">
+                            <TableCell className="table-cell">{proj.id}</TableCell>
+                            <TableCell className="table-cell">{proj.customUserGeneratedName}</TableCell>
+                            <TableCell className="table-cell">
+                              <Button className="outline" onClick={() => handleViewProject(proj.id)}>Данные проекта</Button>
+                            </TableCell>
+                          </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+            ) : (
+                <Typography variant="body2" sx={{ color: 'text.secondary' }} className="text-center py-6 text-muted-foreground">
+                  Нет доступных проектов. Создайте свой первый проект.
+                </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Container>
+
 
       <CreateCompanyModal
         isOpen={isCreateCompanyModalOpen}

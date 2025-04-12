@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Card from '@mui/material/Card';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import ProjectDocumentUploadDialog from "@/components/ProjectDocumentUploadDialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
 
 const Project = () => {
 
@@ -106,12 +116,28 @@ const Project = () => {
   }
 
   return (
-    <div className="space-y-6">
-          <div className="flex items-stretch justify-end">
-            <Button className="link bg-stone-300" onClick={handleDeleteProject}>Удалить проект</Button>
-            <Button className="link bg-stone-300" onClick={() => setIsProjectDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-          </div>
-      <div flex items-center justify-between>
+    <div className=" m-5 space-y-6">
+      <Stack spacing={2} direction="row"  className="flex items-stretch justify-end">
+        <Button
+            variant="destructive"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary mr-10 ml-2"
+            onClick={handleDeleteProject}
+        >
+          Удалить проект
+        </Button>
+        <Button
+            variant="contained"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary"
+            onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
+        >
+          Загрузить документы
+        </Button>
+      </Stack>
+      <div>
         {projectData ? (
           <>
             <Card>
@@ -141,13 +167,13 @@ const Project = () => {
               </CardHeader>
               <CardContent>
                 <Table>
-                  <TableHeader>
+                  <TableHead>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Наименование</TableHead>
-                      <TableHead>Тип документа</TableHead>
+                      <TableCell>ID</TableCell>
+                      <TableCell>Наименование</TableCell>
+                      <TableCell>Тип документа</TableCell>
                     </TableRow>
-                  </TableHeader>
+                  </TableHead>
                   <TableBody>
                     {documents.map((doc) => (
                       <TableRow key={doc.id}>
