@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
+import Button from '@mui/material/Button';
 import CreateContractorModal from "@/components/CreateContractorModal"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import CompanyDocumentUploadDialog from "@/components/CompanyDocumentUploadDialog"
@@ -82,7 +82,15 @@ const ContractorDocument = () => {
   return (
     <div className="space-y-6">
           <div className="flex items-stretch justify-end">
-            <Button className="link bg-stone-300" onClick={handleDeleteDocument}>Удалить документ</Button>
+            <Button
+                variant="destructive"
+                size="small"
+                style={{ background: "#78909c" }}
+                className="button-primary mr-10 ml-2"
+                onClick={handleDeleteDocument}
+            >
+              Удалить документ
+            </Button>
           </div>
       <div flex items-center justify-between>
         {doc ? (

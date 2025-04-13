@@ -1,10 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {DialogContent, DialogTitle, DialogActions, Dialog} from "@mui/material"
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
   const [companyName, setCompanyName] = useState("")
@@ -18,42 +23,86 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreateCompany }) => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog fullWidth maxWidth="md" open={isOpen} onOpenChange={onClose}>
+      <div className="flex justify-between">
+        <DialogTitle>Создать новую компанию</DialogTitle>
+        <IconButton
+            aria-label="close"
+            onClick={onClose}
+            sx={(theme) => ({
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: theme.palette.grey[500],
+            })}
+        >
+          <CloseIcon />
+        </IconButton>
+      </div>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Создать новую компанию</DialogTitle>
-        </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
-              Название компании
-            </label>
-            <Input id="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+            <TextField
+                id="companyName"
+                required
+                className="input-field w-full"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                label="Название компании"
+                variant="standard"
+            />
           </div>
           <div>
-            <label htmlFor="ogrn" className="block text-sm font-medium text-gray-700">
-              ОГРН
-            </label>
-            <Input id="ogrn" value={ogrn} onChange={(e) => setOgrn(e.target.value)} required />
+            <TextField
+                id="ogrn"
+                required
+                type="number"
+                className="input-field w-full"
+                value={ogrn}
+                onChange={(e) => setOgrn(e.target.value)}
+                label="ОГРН"
+                variant="standard"
+            />
           </div>
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-              Country of Origin
-            </label>
-            <Select value={country} onValueChange={setCountry}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a country" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="RU">Российская Федерация</SelectItem>
-                <SelectItem value="BY">Республика Беларусь</SelectItem>
-                <SelectItem value="KZ">Казахстан</SelectItem>
-              </SelectContent>
-            </Select>
+            <FormControl variant="standard" className="input-field w-full">
+              <InputLabel id="country-label" className="block text-sm font-medium text-gray-700">Страна регистрации</InputLabel>
+              <Select
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  label="Select a country"
+              >
+                <MenuItem value="RU">
+                  Российская Федерация
+                </MenuItem>
+                <MenuItem value="BY">
+                  Республика Беларусь
+                </MenuItem>
+                <MenuItem value="KZ">
+                  Казахстан
+                </MenuItem>
+              </Select>
+            </FormControl>
           </div>
-          <DialogFooter>
-            <Button type="submit">Create Company</Button>
-          </DialogFooter>
+          <DialogActions>
+            <Button
+                variant="contained"
+                type="submit"
+                className="button-primary"
+            >
+              Создать команию
+            </Button>
+            <Button
+                variant="outlined"
+                type="submit"
+                onClick={onClose}
+                className="button-primary"
+            >
+              Отменить
+            </Button>
+          </DialogActions>
         </form>
       </DialogContent>
     </Dialog>
