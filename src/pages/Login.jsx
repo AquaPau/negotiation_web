@@ -14,12 +14,38 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
   const { login } = useAuth()
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -28,6 +54,9 @@ const Login = () => {
       login(response.data)
       navigate("/")
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Login failed:", error)
     }
   }
@@ -96,6 +125,13 @@ const Login = () => {
           </Button>
         </form>
       </div>
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   )
 }

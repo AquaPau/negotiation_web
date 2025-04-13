@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import {DialogContent, DialogTitle, DialogActions, Modal} from "@mui/material"
+import {DialogContent, DialogTitle, DialogActions, Dialog} from "@mui/material"
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -35,8 +35,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
   }
 
   return (
-      <Modal maxWidth="md" open={isOpen} onOpenChange={onClose}>
-        <Box sx={{ ...style}}>
+      <Dialog fullWidth maxWidth="md" open={isOpen} onOpenChange={onClose}>
           <div className="flex justify-between">
             <DialogTitle>Создать новую компанию</DialogTitle>
             <IconButton
@@ -52,7 +51,6 @@ const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
               <CloseIcon />
             </IconButton>
           </div>
-        </Box>
       <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -96,7 +94,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
           </DialogActions>
         </form>
       </DialogContent>
-    </Modal>
+    </Dialog>
   )
 }
 

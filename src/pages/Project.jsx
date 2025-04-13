@@ -16,6 +16,8 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
 const Project = () => {
 
@@ -29,6 +31,17 @@ const Project = () => {
   const [uploadMessage, setUploadMessage] = useState("")
   const navigate = useNavigate()
 
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (params.projectId) {
@@ -52,6 +65,9 @@ const Project = () => {
       const result = (response.data == null || response.data.taskResult == null || response.data.taskResult == undefined) ? null : response.data.taskResult
       setProjectResult(result)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch user project data:", error)
       setProjectData(null)
       setProjectResult(null)
@@ -65,6 +81,9 @@ const Project = () => {
       const response = await api.getProjectDocuments(projectData.id)
       setDocuments(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch project documents:", error)
     }
   }
@@ -75,6 +94,9 @@ const Project = () => {
       await api.getProjectResolution(params.projectId, isRetry)
       setIsResultLoading(true)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.log("Failed to catch the project analysis: " + params.projectId)
     }
   }
@@ -84,6 +106,9 @@ const Project = () => {
       await api.deleteProject(projectData)
       navigate(`/`)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to delete project:", error)
     }
   }
@@ -201,8 +226,15 @@ const Project = () => {
           onUploadError={handleUploadError}
           projectId={projectData?.id}
         />
-      </div>
 
+      </div>
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   );
 };

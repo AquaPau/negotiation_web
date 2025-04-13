@@ -13,6 +13,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Register = () => {
   const [firstName, setFirstName] = useState("")
@@ -22,6 +24,30 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const navigate = useNavigate()
+
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const handleMouseUpPassword = (event) => {
+    event.preventDefault();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -39,6 +65,9 @@ const Register = () => {
     } catch (error) {
       console.error("Registration failed:", error)
       setError(error.response?.data?.message || "Ошибка регистрации. Пожалуйста, попробуйте снова.")
+      const message = error?.response?.data ?? 'Ошибка регистрации. Пожалуйста, попробуйте снова.'
+      setErrorMessage(message)
+      handleOpenSnack()
     }
   }
 
@@ -171,6 +200,13 @@ const Register = () => {
           </Button>
         </form>
       </div>
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   )
 }

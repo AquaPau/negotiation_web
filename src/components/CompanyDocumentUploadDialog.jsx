@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import {Dialog, DialogContent, DialogTitle, DialogActions, Modal} from "@mui/material"
+import {Dialog, DialogContent, DialogTitle, DialogActions} from "@mui/material"
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -31,19 +31,6 @@ const VisuallyHiddenInput = styled('input')({
   whiteSpace: 'nowrap',
   width: 1,
 });
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  shadow: '6px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
 
 const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, companyId }) => {
   const [selectedFiles, setSelectedFiles] = useState([])
@@ -95,8 +82,7 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
   }
 
   return (
-    <Modal maxWidth="md" open={isOpen} onOpenChange={onClose}>
-      <Box sx={{ ...style}}>
+    <Dialog fullWidth  maxWidth="md" open={isOpen} onOpenChange={onClose}>
         <div className="flex justify-between">
           <DialogTitle>Загрузить документы</DialogTitle>
           <IconButton
@@ -120,7 +106,6 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
                 variant="contained"
                 tabIndex={-1}
                 startIcon={<CloudUploadIcon />}
-                onClick={handleAddMoreFiles}
             >
               {selectedFiles.length > 0 ? "Добавить еще" : "Выбрать файл"}
               <VisuallyHiddenInput
@@ -135,23 +120,23 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Название</TableCell>
-                      <TableCell>Тип</TableCell>
+                      <TableCell width="40%">Название</TableCell>
+                      <TableCell width="30%">Тип</TableCell>
                       <TableCell>Действие</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {selectedFiles.map((file, index) => (
                         <TableRow key={index}>
-                          <TableCell>{file.file.name}</TableCell>
-                          <TableCell>
+                          <TableCell width="40%">{file.file.name}</TableCell>
+                          <TableCell width="30%">
                             <FormControl variant="standard" className="input-field w-full">
                               <InputLabel id="" className="block text-sm font-medium text-gray-700">Тип документа</InputLabel>
                               <Select
                                   labelId="demo-simple-select-standard-label"
                                   id="demo-simple-select-standard"
                                   value={file.type}
-                                  onChange={(value) => handleTypeChange(index, value)}
+                                  onChange={(evt) => handleTypeChange(index, evt.target.value)}
                                   label="Тип документа"
                               >
                                 <MenuItem value="LABOR_CONTRACT">ТРУДОВОЙ ДОГОВОР</MenuItem>
@@ -161,6 +146,7 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
                                 <MenuItem value="SERVICE_CONTRACT">ДОГОВОР УСЛУГ/РАБОТ</MenuItem>
                                 <MenuItem value="LICENSE_CONTRACT">ЛИЦЕНЗИОННЫЙ ДОГОВОР</MenuItem>
                                 <MenuItem value="DEFAULT">ДРУГОЕ</MenuItem>
+                                <MenuItem value="CORPORATE">CORPORATE</MenuItem>
                               </Select>
                             </FormControl>
                           </TableCell>
@@ -181,9 +167,8 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
             Загрузить
           </Button>
         </DialogActions>
-      </Box>
 
-    </Modal>
+    </Dialog>
   )
 }
 

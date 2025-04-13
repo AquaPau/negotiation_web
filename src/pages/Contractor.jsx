@@ -18,6 +18,8 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';import ContractorDocumentUploadDialog from "@/components/ContractorDocumentUploadDialog"
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
 
 const Contractor = () => {
@@ -28,6 +30,18 @@ const Contractor = () => {
   const [isContractorDocumentUploadDialogOpen, setIsContractorDocumentUploadDialogOpen] = useState(false)
   const [uploadMessage, setUploadMessage] = useState("")
   const navigate = useNavigate()
+
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (params.companyId && params.contractorId) {
@@ -42,6 +56,9 @@ const Contractor = () => {
       const response = await api.getContractor(params.companyId, params.contractorId)
       setContractor(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch contractor details:", error)
     } finally {
       setIsLoading(false)
@@ -53,6 +70,9 @@ const Contractor = () => {
       await api.deleteContractor(params.companyId, params.contractorId)
       navigate(`/company/${params.companyId}`)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to delete company:", error)
     }
   }
@@ -62,6 +82,9 @@ const Contractor = () => {
       const response = await api.getContractorDocuments(params.companyId, params.contractorId)
       setDocuments(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch company documents:", error)
     }
   }
@@ -145,59 +168,59 @@ const Contractor = () => {
                   </Typography>
                 </CardHeader>
                 <CardContent>
-                  <p>
+                  <div className="flex items-stretch justify-start">
                     <Typography variant="subtitle2" gutterBottom className="inline">
                       Страна регистрации: &nbsp;
                     </Typography>
                     <Typography variant="body2" gutterBottom className="inline">
                       {contractor.residence}
                     </Typography>
-                  </p>
+                  </div>
 
-                  {contractor.fullName &&  <p>
+                  {contractor.fullName &&  <div className="flex items-stretch justify-start">
                     <Typography variant="subtitle2" gutterBottom className="inline">
                       Наименование: &nbsp;
                     </Typography>
                     <Typography variant="body2" gutterBottom className="inline">
                       {contractor.fullName}
                     </Typography>
-                  </p>}
+                  </div>}
                   {contractor.inn && contractor.inn !== "null" &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           ИНН: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {contractor.inn}
                         </Typography>
-                      </p>}
+                      </div>}
                   {contractor.ogrn && contractor.ogrn !== "null" &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           ОГРН: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {contractor.ogrn}
                         </Typography>
-                      </p>}
+                      </div>}
                   {contractor.managerTitle &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           Исполнительный орган: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {contractor.managerTitle}
                         </Typography>
-                      </p>}
+                      </div>}
                   {contractor.managerName &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           ФИО исполнительного органа: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {contractor.managerName}
                         </Typography>
-                      </p>}
+                      </div>}
                 </CardContent>
               </Card>
             </Paper>
@@ -252,7 +275,15 @@ const Contractor = () => {
           companyId={params.companyId}
           contractorId={contractor?.id}
         />
+
       </div>
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   )
 }

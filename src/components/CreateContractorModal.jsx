@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import {DialogContent, DialogTitle, DialogActions, Modal} from "@mui/material"
-import Box from '@mui/material/Box';
+import {DialogContent, DialogTitle, DialogActions, Dialog} from "@mui/material"
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -12,19 +11,6 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  shadow: '6px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
 const countries = [
   { code: "RU", name: "Russia" },
   { code: "BY", name: "Belarus" },
@@ -42,8 +28,7 @@ const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
   }
 
   return (
-    <Modal maxWidth="md" open={isOpen} onOpenChange={onClose}>
-      <Box sx={{ ...style}}>
+    <Dialog fullWidth maxWidth="md" open={isOpen} onOpenChange={onClose}>
         <div className="flex justify-between">
           <DialogTitle>Создать контрагента</DialogTitle>
           <IconButton
@@ -59,7 +44,6 @@ const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
             <CloseIcon />
           </IconButton>
         </div>
-      </Box>
       <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -125,7 +109,7 @@ const CreateContractorModal = ({ isOpen, onClose, onCreateContractor }) => {
           </DialogActions>
         </form>
       </DialogContent>
-    </Modal>
+    </Dialog>
   )
 }
 

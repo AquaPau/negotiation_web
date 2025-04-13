@@ -17,7 +17,9 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Company = () => {
 
@@ -31,6 +33,17 @@ const Company = () => {
   const [uploadMessage, setUploadMessage] = useState("")
   const navigate = useNavigate()
 
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (params.companyId) {
@@ -58,6 +71,9 @@ const Company = () => {
       console.log(response.data)
       setCompanyData(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch user company data:", error)
       setCompanyData(null)
     } finally {
@@ -70,6 +86,9 @@ const Company = () => {
       const response = await api.getCompanyDocuments(companyData.id)
       setDocuments(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch company documents:", error)
     }
   }
@@ -80,6 +99,9 @@ const Company = () => {
       const response = await api.getContractors(companyData.id)
       setContractorsList(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch company contractor list:", error)
       setContractorsList([])
     } finally {
@@ -105,6 +127,9 @@ const Company = () => {
         fetchCompanyContractors()
       }, 120000)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to create company:", error)
     }
   }
@@ -121,6 +146,9 @@ const Company = () => {
         }, 60000)
 
       } catch (error) {
+        const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+        setErrorMessage(message)
+        handleOpenSnack()
         console.log("Failed to catch the document insights: " + docId)
       }
     }
@@ -130,6 +158,9 @@ const Company = () => {
       const url = `/company/${companyData.id}/contractor/${contractorId}`
       navigate(url)
     } else {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Company data about contractor or ID is missing")
     }
   }
@@ -148,6 +179,9 @@ const Company = () => {
       await api.deleteCompany(companyData)
       navigate(`/`)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to delete company:", error)
     }
   }
@@ -227,59 +261,59 @@ const Company = () => {
                   </Typography>
                 </CardHeader>
                 <CardContent>
-                  <p>
+                  <div className="flex items-stretch justify-start">
                     <Typography variant="subtitle2" gutterBottom className="inline">
                       Страна регистрации: &nbsp;
                     </Typography>
                     <Typography variant="body2" gutterBottom className="inline">
                       {companyData.residence}
                     </Typography>
-                  </p>
+                  </div>
 
-                  {companyData.fullName &&  <p>
+                  {companyData.fullName &&  <div className="flex items-stretch justify-start">
                     <Typography variant="subtitle2" gutterBottom className="inline">
                       Наименование: &nbsp;
                     </Typography>
                     <Typography variant="body2" gutterBottom className="inline">
                       {companyData.fullName}
                     </Typography>
-                  </p>}
+                  </div>}
                   {companyData.inn && companyData.inn !== "null" &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           ИНН: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {companyData.inn}
                         </Typography>
-                      </p>}
+                      </div>}
                   {companyData.ogrn && companyData.ogrn !== "null" &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           ОГРН: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {companyData.ogrn}
                         </Typography>
-                      </p>}
+                      </div>}
                   {companyData.managerTitle &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           Исполнительный орган: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {companyData.managerTitle}
                         </Typography>
-                      </p>}
+                      </div>}
                   {companyData.managerName &&
-                      <p>
+                      <div className="flex items-stretch justify-start">
                         <Typography variant="subtitle2" gutterBottom className="inline">
                           ФИО исполнительного органа: &nbsp;
                         </Typography>
                         <Typography variant="body2" gutterBottom className="inline">
                           {companyData.managerName}
                         </Typography>
-                      </p>}
+                      </div>}
                 </CardContent>
               </Card>
             </Paper>
@@ -343,7 +377,7 @@ const Company = () => {
                           </TableBody>
                         </Table>
                     ) : (
-                        <Typography variant="h4">
+                        <Typography variant="h5">
                           Контрагентов не найдено
                         </Typography>
                       )
@@ -376,6 +410,13 @@ const Company = () => {
       />
       </div>
 
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   );
 };

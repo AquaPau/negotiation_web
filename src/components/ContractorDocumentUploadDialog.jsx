@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import {Dialog, DialogContent, DialogTitle, DialogActions, Modal} from "@mui/material"
+import {Dialog, DialogContent, DialogTitle, DialogActions} from "@mui/material"
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -95,8 +95,7 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
   }
 
   return (
-    <Modal maxWidth="md" open={isOpen} onOpenChange={onClose}>
-      <Box sx={{ ...style}}>
+    <Dialog fullWidth maxWidth="md" open={isOpen} onOpenChange={onClose}>
         <div className="flex justify-between">
           <DialogTitle>Загрузить документы</DialogTitle>
           <IconButton
@@ -120,7 +119,6 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
                 variant="contained"
                 tabIndex={-1}
                 startIcon={<CloudUploadIcon />}
-                onClick={handleAddMoreFiles}
             >
               {selectedFiles.length > 0 ? "Добавить еще" : "Выбрать файл"}
               <VisuallyHiddenInput
@@ -181,9 +179,8 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
             Загрузить
           </Button>
         </DialogActions>
-      </Box>
 
-    </Modal>
+    </Dialog>
   )
 }
 

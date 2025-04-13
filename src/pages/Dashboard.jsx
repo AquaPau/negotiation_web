@@ -12,13 +12,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Dashboard = () => {
   const [companyData, setCompanyData] = useState([])
@@ -27,6 +29,17 @@ const Dashboard = () => {
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     fetchUserCompanies()
@@ -60,6 +73,9 @@ const Dashboard = () => {
       setCompanyData(response.data)
       setIsCreateCompanyModalOpen(false)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to create company:", error)
     }
   }
@@ -94,7 +110,10 @@ const Dashboard = () => {
       setProjectData(response.data)
       setIsCreateProjectModalOpen(false)
     } catch (error) {
-      console.error("Failed to create company:", error)
+      const message = error?.response?.data ?? 'неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
+      console.error("Failed to create project:", error)
     }
   }
 
@@ -110,7 +129,8 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-stretch justify-end">
+      <Stack  spacing={2} direction="row"  className="flex items-stretch justify-end">
+
         <Button
             variant="contained"
             size="small"
@@ -129,16 +149,16 @@ const Dashboard = () => {
         >
           Создать новый проект
         </Button>
-      </div>
+      </Stack>
       <Container className="flex items-center justify-center w-full  mt-10 mb-10">
-        <Card>
+        <Card className="w-full">
           <CardHeader>
-            <Typography variant="h2"  title=" Мои компании">
+            <Typography variant="h4"  title=" Мои компании">
               Мои компании
             </Typography>
           </CardHeader>
           <CardContent>
-            <Typography variant="h3" className="mb-10"  title=" Мои компании">
+            <Typography variant="h4" className="mb-10"  title=" Мои компании">
               Мои компании
             </Typography>
             {companyData.length > 0 ? (
@@ -175,14 +195,14 @@ const Dashboard = () => {
 
 
       <Container className="flex items-center justify-center w-full  mt-10">
-        <Card>
+        <Card className="w-full">
           <CardHeader>
-            <Typography variant="h2"  title=" Мои проекты">
+            <Typography variant="h4"  title=" Мои проекты">
               Мои проекты
             </Typography>
           </CardHeader>
           <CardContent>
-            <Typography variant="h3" className="mb-10"  title=" Мои проекты">
+            <Typography variant="h4" className="mb-10"  title=" Мои проекты">
               Мои проекты
             </Typography>
             {projectData.length > 0 ? (
@@ -228,6 +248,14 @@ const Dashboard = () => {
         onClose={() => setIsCreateProjectModalOpen(false)}
         onCreateProject={handleCreateProject}
       />
+
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+      <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   )
 }
