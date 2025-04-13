@@ -103,7 +103,7 @@ const Project = () => {
 
   const handleDeleteProject = async () => {
     try {
-      await api.deleteProject(projectData)
+      await api.deleteProject(projectData.id)
       navigate(`/`)
     } catch (error) {
       const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
@@ -157,7 +157,7 @@ const Project = () => {
             size="small"
             style={{ background: "#78909c" }}
             className="button-primary"
-            onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
+            onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
         >
           Загрузить документы
         </Button>
