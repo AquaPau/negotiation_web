@@ -111,17 +111,6 @@ const CompanyDocument = () => {
                  {(doc.description != null && doc.description.text) && <Button className="outline" onClick={() => analyseDocumentDescription(doc.id, true)}>Обновить инфо</Button>}
                </CardContent>
              </Card>
-             <Card>
-               <CardHeader>
-                 <CardTitle>Риски документа</CardTitle>
-               </CardHeader>
-               <CardContent>
-                 {(doc.risks != null && doc.risks.text) || <Button className="outline" onClick={() => analyseDocumentRisks(doc.id, false)}>Узнать</Button>}
-               </CardContent>
-               <CardContent>
-                 {(doc.risks != null && doc.risks.text) && <Button className="outline" onClick={() => analyseDocumentRisks(doc.id, true)}>Обновить инфо</Button>}
-               </CardContent>
-            </Card>
 
           </>) : (
           <CardHeader>
