@@ -1,20 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { api } from "@/api/api"
-import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
-import Input from '@mui/material/Input';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import TextField from "@mui/material/TextField"
+import InputLabel from "@mui/material/InputLabel"
+import InputAdornment from "@mui/material/InputAdornment"
+import FormControl from "@mui/material/FormControl"
+import OutlinedInput from "@mui/material/OutlinedInput"
+import IconButton from "@mui/material/IconButton"
+import Visibility from "@mui/icons-material/Visibility"
+import VisibilityOff from "@mui/icons-material/VisibilityOff"
+import Button from "@mui/material/Button"
+import Typography from "@mui/material/Typography"
+import Snackbar from "@mui/material/Snackbar"
+import Alert from "@mui/material/Alert"
+import Box from "@mui/material/Box"
+import Paper from "@mui/material/Paper"
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import GavelIcon from "@mui/icons-material/Gavel"
 
 const Register = () => {
   const [firstName, setFirstName] = useState("")
@@ -26,28 +31,26 @@ const Register = () => {
   const navigate = useNavigate()
 
   const [openSnack, setOpenSnack] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
   const handleOpenSnack = () => {
-    setOpenSnack(true);
-  };
+    setOpenSnack(true)
+  }
+
   const handleCloseSnack = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
+    if (reason === "clickaway") {
+      return
     }
-    setOpenSnack(false);
-  };
-  const [errorMessage, setErrorMessage] = useState(null);
+    setOpenSnack(false)
+  }
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = () => setShowPassword((show) => !show)
 
   const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -58,158 +61,167 @@ const Register = () => {
       return
     }
 
+    setIsLoading(true)
     try {
       const response = await api.register({ firstName, lastName, email, password })
       console.log("Registration successful:", response.data)
       navigate("/login")
     } catch (error) {
       console.error("Registration failed:", error)
-      setError(error.response?.data?.message || "Ошибка регистрации. Пожалуйста, попробуйте снова.")
-      const message = error?.response?.data ?? 'Ошибка регистрации. Пожалуйста, попробуйте снова.'
+      const message = error?.response?.data ?? "Ошибка регистрации. Пожалуйста, попробуйте снова."
       setErrorMessage(message)
       handleOpenSnack()
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
-      <div className="form-container">
-        <div className="text-center mb-8">
-          <Typography variant="h4" gutterBottom>
-            Создание аккаунта
+    <Container component="main" maxWidth="sm" sx={{ mt: 8, mb: 8 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <GavelIcon sx={{ fontSize: 32, mr: 1, color: "primary.main" }} />
+            <Typography component="h1" variant="h4" fontWeight={700}>
+              Legentum
+            </Typography>
+          </Box>
+          <Typography component="h2" variant="h5" fontWeight={600}>
+            Регистрация
           </Typography>
-          <Typography variant="subtitle1" gutterBottom className="mt-2">
-            Присоединяйтесь к нашей сети профессионалов
-          </Typography>
-          {error && <Typography variant="caption" gutterBottom className="text-destructive mt-2">
-            {error}
-          </Typography>}
-        </div>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="input-group">
+          {error && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
+          )}
+        </Box>
+
+        <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%", mt: 1 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
               <TextField
-                  id="first-name"
-                  name="firstName"
-                  type="text"
-                  required
-                  className="input-field"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  label="Имя"
-                  variant="standard"
-              />
-            </div>
-            <div className="input-group">
-              <TextField
-                  id="last-name"
-                  name="lastName"
-                  type="text"
-                  required
-                  className="input-field"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  label="Фамилия"
-                  variant="standard"
-              />
-            </div>
-          </div>
-          <div className="input-group">
-            <TextField
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
+                autoComplete="given-name"
+                name="firstName"
                 required
-                className="input-field w-100"
+                fullWidth
+                id="firstName"
+                label="Имя"
+                autoFocus
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                required
+                fullWidth
+                id="lastName"
+                label="Фамилия"
+                name="lastName"
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                id="email"
+                label="Email"
+                name="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                label="Email"
-                variant="standard"
-            />
-          </div>
-          <div className="input-group">
-            <FormControl
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="input-field w-100"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                label="Пароль"
-                variant="standard"
-            >
-              <InputLabel htmlFor="standard-adornment-password">Пароль</InputLabel>
-              <Input
-                  id="standard-adornment-password"
-                  type={showPassword ? 'text' : 'password'}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel htmlFor="password">Пароль</InputLabel>
+                <OutlinedInput
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
-                          aria-label={
-                            showPassword ? 'hide the password' : 'display the password'
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   }
-              />
-            </FormControl>
-          </div>
-          <div className="input-group">
-            <FormControl
-                variant="standard"
-                id="confirm-password"
-                name="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="input-field w-100"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-            >
-              <InputLabel htmlFor="standard-adornment-password">Подтверждение пароля</InputLabel>
-              <Input
-                  id="standard-adornment-password"
-                  type={showPassword ? 'text' : 'password'}
+                  label="Пароль"
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel htmlFor="confirm-password">Подтверждение пароля</InputLabel>
+                <OutlinedInput
+                  id="confirm-password"
+                  name="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
-                          aria-label={
-                            showPassword ? 'hide the password' : 'display the password'
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   }
-              />
-            </FormControl>
-          </div>
-          <Button variant="outlined" type="submit" className="button-primary w-full">
-            Создать аккаунт
+                  label="Подтверждение пароля"
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
+            {isLoading ? "Регистрация..." : "Зарегистрироваться"}
           </Button>
-        </form>
-      </div>
-      <Snackbar
-          open={openSnack}
-          autoHideDuration={6000}
-          onClose={handleCloseSnack}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
+
+          <Box sx={{ textAlign: "center", mt: 2 }}>
+            <Typography variant="body2">
+              Уже есть аккаунт?{" "}
+              <Link to="/login" style={{ color: "#3498db", textDecoration: "none" }}>
+                Войти
+              </Link>
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
+
+      <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleCloseSnack}>
+        <Alert severity="error" onClose={handleCloseSnack}>
+          {errorMessage}
+        </Alert>
       </Snackbar>
-    </div>
+    </Container>
   )
 }
 
 export default Register
-
