@@ -152,13 +152,18 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
                                   onChange={(value) => handleTypeChange(index, value)}
                                   label="Тип документа"
                               >
-                                <MenuItem value="LABOR_CONTRACT">ТРУДОВОЙ ДОГОВОР</MenuItem>
-                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT">ДОГОВОР АРЕНДЫ НЕДВИЖИМОСТИ</MenuItem>
-                                <MenuItem value="SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ</MenuItem>
-                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ НЕДВИЖИМОСТИ</MenuItem>
-                                <MenuItem value="SERVICE_CONTRACT">ДОГОВОР УСЛУГ/РАБОТ</MenuItem>
-                                <MenuItem value="LICENSE_CONTRACT">ЛИЦЕНЗИОННЫЙ ДОГОВОР</MenuItem>
-                                <MenuItem value="DEFAULT">ДРУГОЕ</MenuItem>
+                                <MenuItem value="LABOR_CONTRACT_EMPLOYER">Трудовой договор (сторона - работодатель)</MenuItem>
+                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT_LANDLORD">Договор аренды недвижимости (сторона - арендодатель)</MenuItem>
+                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT_TENANT">Договор аренды недвижимости (сторона - арендатор)</MenuItem>
+                                <MenuItem value="SALES_CONTRACT_SELLER">Договор купли-продажи/поставки (сторона - продавец/поставщик)</MenuItem>
+                                <MenuItem value="SALES_CONTRACT_CUSTOMER">Договор купли-продажи/поставки (сторона - покупатель)</MenuItem>
+                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT_SELLER">Договор купли-продажи недвижимости (сторона - продавец)</MenuItem>
+                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT_CUSTOMER">Договор купли-продажи недвижимости (сторона - покупатель)</MenuItem>
+                                <MenuItem value="SERVICE_CONTRACT_CONTRACTOR">Договор оказания услуг/выполнения работ (сторона - исполнитель)</MenuItem>
+                                <MenuItem value="SERVICE_CONTRACT_CUSTOMER">Договор оказания услуг/выполнения работ (сторона - заказчик)</MenuItem>
+                                <MenuItem value="LICENSE_CONTRACT_LICENSOR">Лицензионный договор (сторона - лицензиар)</MenuItem>
+                                <MenuItem value="LICENSE_CONTRACT_LICENSEE">Лицензионный договор (сторона - лицензиат)</MenuItem>
+                                <MenuItem value="DEFAULT">Иные документы</MenuItem>
                               </Select>
                             </FormControl>
                           </TableCell>

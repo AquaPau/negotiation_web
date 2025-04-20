@@ -153,13 +153,7 @@ const ProjectDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
                                   onChange={(value) => handleTypeChange(index, value)}
                                   label="Тип документа"
                               >
-                                <MenuItem value="LABOR_CONTRACT">ТРУДОВОЙ ДОГОВОР</MenuItem>
-                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT">ДОГОВОР АРЕНДЫ НЕДВИЖИМОСТИ</MenuItem>
-                                <MenuItem value="SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ</MenuItem>
-                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT">ДОГОВОР КУПЛИ-ПРОДАЖИ НЕДВИЖИМОСТИ</MenuItem>
-                                <MenuItem value="SERVICE_CONTRACT">ДОГОВОР УСЛУГ/РАБОТ</MenuItem>
-                                <MenuItem value="LICENSE_CONTRACT">ЛИЦЕНЗИОННЫЙ ДОГОВОР</MenuItem>
-                                <MenuItem value="DEFAULT">ДРУГОЕ</MenuItem>
+                                <MenuItem value="DEFAULT">ПРОЕКТНЫЙ ДОКУМЕНТ</MenuItem>
                               </Select>
                             </FormControl>
                           </TableCell>
