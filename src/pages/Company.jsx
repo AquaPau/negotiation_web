@@ -282,11 +282,10 @@ const Company = () => {
         </Box>
       </Box>
 
-      {companyData ? (
-        <Grid container spacing={4}>
-          {/* Company Details */}
-          <Grid item xs={12}>
-            <Card>
+      {companyData ? ( <>
+      {/* Company Details */}
+
+            <Card sx={{ mb: 4}}>
               <CardContent>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <BusinessIcon sx={{ mr: 1, color: "primary.main" }} />
@@ -298,29 +297,31 @@ const Company = () => {
 
                 <Grid container spacing={3}>
                   {companyData.fullName && (
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12}>
                       <Typography variant="subtitle2" color="text.secondary">
                         Полное наименование
                       </Typography>
                       <Typography variant="body1">{companyData.fullName}</Typography>
                     </Grid>
                   )}
-                  {companyData.inn && companyData.inn !== "null" && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        ИНН
-                      </Typography>
-                      <Typography variant="body1">{companyData.inn}</Typography>
-                    </Grid>
-                  )}
-                  {companyData.ogrn && companyData.ogrn !== "null" && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        ОГРН
-                      </Typography>
-                      <Typography variant="body1">{companyData.ogrn}</Typography>
-                    </Grid>
-                  )}
+                  <Grid container item xs={12} spacing={3}>
+                    {companyData.inn && companyData.inn !== "null" && (
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          ИНН
+                        </Typography>
+                        <Typography variant="body1">{companyData.inn}</Typography>
+                      </Grid>
+                    )}
+                    {companyData.ogrn && companyData.ogrn !== "null" && (
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          ОГРН
+                        </Typography>
+                        <Typography variant="body1">{companyData.ogrn}</Typography>
+                      </Grid>
+                    )}
+                  </Grid>
                   {(companyData.managerTitle || companyData.managerName) && (
                     <Grid item xs={12}>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -336,11 +337,10 @@ const Company = () => {
                 </Grid>
               </CardContent>
             </Card>
-          </Grid>
 
           {/* Documents */}
-          <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%"}}>
+
+            <Card sx={{ mb: 4 }}>
               <CardContent>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -401,11 +401,10 @@ const Company = () => {
                 )}
               </CardContent>
             </Card>
-          </Grid>
 
           {/* Contractors */}
-          <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%" }}>
+
+            <Card sx={{ mb: 4 }}>
               <CardContent>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -460,9 +459,8 @@ const Company = () => {
                 )}
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
-      ) : (
+
+      </>) : (
         <Card>
           <CardContent sx={{ textAlign: "center", py: 6 }}>
             <Typography variant="h5" gutterBottom>

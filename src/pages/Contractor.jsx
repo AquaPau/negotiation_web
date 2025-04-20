@@ -192,14 +192,14 @@ const Contractor = () => {
         <Link color="inherit" href={`/company/${params.companyId}`} underline="hover">
           Компания
         </Link>
-        <Typography color="text.primary">{contractor?.customUserGeneratedName || "Контрагент"}</Typography>
+        <Typography color="text.primary">{contractor?.customName || "Контрагент"}</Typography>
       </Breadcrumbs>
 
       {/* Header with actions */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 4 }}>
         <Box sx={{ maxWidth: "70%" }}>
           <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-            {contractor?.customUserGeneratedName || "Контрагент не найден"}
+            {contractor?.customName || "Контрагент не найден"}
           </Typography>
           {contractor?.residence && (
             <Chip
@@ -231,11 +231,10 @@ const Contractor = () => {
         </Box>
       </Box>
 
-      {contractor ? (
-        <Grid container spacing={4}>
+      {contractor ? (<>
+
           {/* Contractor Details */}
-          <Grid item xs={12}>
-            <Card>
+            <Card sx={{ mb: 4 }}>
               <CardContent>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <BusinessIcon sx={{ mr: 1, color: "primary.main" }} />
@@ -246,7 +245,7 @@ const Contractor = () => {
                 <Divider sx={{ mb: 3 }} />
 
                 <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12}>
                     <Typography variant="subtitle2" color="text.secondary">
                       Полное наименование
                     </Typography>
@@ -281,11 +280,9 @@ const Contractor = () => {
                 </Grid>
               </CardContent>
             </Card>
-          </Grid>
 
           {/* Documents */}
-          <Grid item xs={12}>
-            <Card>
+            <Card sx={{ mb: 4 }}>
               <CardContent>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -346,8 +343,7 @@ const Contractor = () => {
                 )}
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+            </>
       ) : (
         <Card>
           <CardContent sx={{ textAlign: "center", py: 6 }}>
