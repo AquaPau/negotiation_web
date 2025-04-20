@@ -3,24 +3,37 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { api } from "@/api/api"
-import Button from '@mui/material/Button';
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import CompanyDocumentUploadDialog from "@/components/CompanyDocumentUploadDialog"
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';import ContractorDocumentUploadDialog from "@/components/ContractorDocumentUploadDialog"
-import Alert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
-
+import Container from "@mui/material/Container"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import Typography from "@mui/material/Typography"
+import Table from "@mui/material/Table"
+import TableBody from "@mui/material/TableBody"
+import TableCell from "@mui/material/TableCell"
+import TableHead from "@mui/material/TableHead"
+import TableRow from "@mui/material/TableRow"
+import Button from "@mui/material/Button"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import Divider from "@mui/material/Divider"
+import Chip from "@mui/material/Chip"
+import Snackbar from "@mui/material/Snackbar"
+import Alert from "@mui/material/Alert"
+import Skeleton from "@mui/material/Skeleton"
+import Breadcrumbs from "@mui/material/Breadcrumbs"
+import Link from "@mui/material/Link"
+import AddIcon from "@mui/icons-material/Add"
+import DeleteIcon from "@mui/icons-material/Delete"
+import UploadFileIcon from "@mui/icons-material/UploadFile"
+import BusinessIcon from "@mui/icons-material/Business"
+import DescriptionIcon from "@mui/icons-material/Description"
+import NavigateNextIcon from "@mui/icons-material/NavigateNext"
+import Dialog from "@mui/material/Dialog"
+import DialogActions from "@mui/material/DialogActions"
+import DialogContent from "@mui/material/DialogContent"
+import DialogContentText from "@mui/material/DialogContentText"
+import DialogTitle from "@mui/material/DialogTitle"
+import ContractorDocumentUploadDialog from "@/components/ContractorDocumentUploadDialog"
 
 const Contractor = () => {
   const params = useParams()
@@ -29,19 +42,21 @@ const Contractor = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isContractorDocumentUploadDialogOpen, setIsContractorDocumentUploadDialogOpen] = useState(false)
   const [uploadMessage, setUploadMessage] = useState("")
+  const [openSnack, setOpenSnack] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const navigate = useNavigate()
 
-  const [openSnack, setOpenSnack] = useState(false)
   const handleOpenSnack = () => {
-    setOpenSnack(true);
-  };
+    setOpenSnack(true)
+  }
+
   const handleCloseSnack = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
+    if (reason === "clickaway") {
+      return
     }
-    setOpenSnack(false);
-  };
-  const [errorMessage, setErrorMessage] = useState(null);
+    setOpenSnack(false)
+  }
 
   useEffect(() => {
     if (params.companyId && params.contractorId) {
@@ -56,7 +71,7 @@ const Contractor = () => {
       const response = await api.getContractor(params.companyId, params.contractorId)
       setContractor(response.data)
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
       console.error("Failed to fetch contractor details:", error)
@@ -65,36 +80,33 @@ const Contractor = () => {
     }
   }
 
-  const handleDeleteContractor = async () => {
-    try {
-      await api.deleteContractor(params.companyId, params.contractorId)
-      navigate(`/company/${params.companyId}`)
-    } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
-      setErrorMessage(message)
-      handleOpenSnack()
-      console.error("Failed to delete company:", error)
-    }
-  }
-
   const fetchContractorDocuments = async () => {
     try {
       const response = await api.getContractorDocuments(params.companyId, params.contractorId)
       setDocuments(response.data)
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
-      console.error("Failed to fetch company documents:", error)
+      console.error("Failed to fetch contractor documents:", error)
     }
   }
 
-  if (isLoading) {
-    return <div className="text-center mt-8">Loading contractor details...</div>
+  const handleDeleteContractorConfirm = () => {
+    setDeleteConfirmOpen(true)
   }
 
-  if (!contractor) {
-    return <div className="text-center mt-8">Contractor not found</div>
+  const handleDeleteContractor = async () => {
+    try {
+      await api.deleteContractor(params.companyId, params.contractorId)
+      setDeleteConfirmOpen(false)
+      navigate(`/company/${params.companyId}`)
+    } catch (error) {
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
+      setErrorMessage(message)
+      handleOpenSnack()
+      console.error("Failed to delete contractor:", error)
+    }
   }
 
   const handleViewContractorDocumentDetails = (documentId) => {
@@ -102,27 +114,9 @@ const Contractor = () => {
       const url = `/company/${params.companyId}/contractor/${params.contractorId}/document/${documentId}`
       navigate(url)
     } else {
-      console.error("Contractor data about document or ID is missing")
+      setErrorMessage("Данные о контрагенте отсутствуют")
+      handleOpenSnack()
     }
-  }
-
-  const defineCompanyResidence = (code) => {
-    const answer = code == "RU" ?  "Российская Федерация"
-    : code == "KZ" ?  "Казахстан"
-    : code == "BY" ? "Республика Беларусь"
-    : "Другая"
-    return answer
-  }
-
-  const defineDocTypeName = (name) => {
-    const answer = name == "LABOR_CONTRACT" ?  "Трудовой договор"
-        : name == "REAL_ESTATE_LEASE_CONTRACT" ?  "Договор аренды недвижимости"
-        : name == "SALES_CONTRACT" ? "Договор купли-продажи"
-        : name == "REAL_ESTATE_SALES_CONTRACT" ? "Договор купли-продажи недвижимости"
-        : name == "SERVICE_CONTRACT" ? "Договор услуг/работ"
-        : name == "LICENSE_CONTRACT" ? "Лицензионный договор"
-        : "Другое"
-        return answer
   }
 
   const handleUploadSuccess = (message) => {
@@ -132,159 +126,290 @@ const Contractor = () => {
   }
 
   const handleUploadError = (message) => {
-    setUploadMessage(message)
+    setErrorMessage(message)
+    handleOpenSnack()
+  }
+
+  const defineCompanyResidence = (code) => {
+    return code === "RU"
+      ? "Российская Федерация"
+      : code === "KZ"
+        ? "Казахстан"
+        : code === "BY"
+          ? "Республика Беларусь"
+          : "Другая"
+  }
+
+  const defineDocTypeName = (name) => {
+    const types = {
+      LABOR_CONTRACT: "Трудовой договор",
+      REAL_ESTATE_LEASE_CONTRACT: "Договор аренды недвижимости",
+      SALES_CONTRACT: "Договор купли-продажи",
+      REAL_ESTATE_SALES_CONTRACT: "Договор купли-продажи недвижимости",
+      SERVICE_CONTRACT: "Договор услуг/работ",
+      LICENSE_CONTRACT: "Лицензионный договор",
+      LABOR_CONTRACT_EMPLOYER: "Трудовой договор (работодатель)",
+      REAL_ESTATE_LEASE_CONTRACT_LANDLORD: "Договор аренды недвижимости (арендодатель)",
+      REAL_ESTATE_LEASE_CONTRACT_TENANT: "Договор аренды недвижимости (арендатор)",
+      SALES_CONTRACT_SELLER: "Договор купли-продажи (продавец)",
+      SALES_CONTRACT_CUSTOMER: "Договор купли-продажи (покупатель)",
+      REAL_ESTATE_SALES_CONTRACT_SELLER: "Договор купли-продажи недвижимости (продавец)",
+      REAL_ESTATE_SALES_CONTRACT_CUSTOMER: "Договор купли-продажи недвижимости (покупатель)",
+      SERVICE_CONTRACT_CONTRACTOR: "Договор услуг/работ (исполнитель)",
+      SERVICE_CONTRACT_CUSTOMER: "Договор услуг/работ (заказчик)",
+      LICENSE_CONTRACT_LICENSOR: "Лицензионный договор (лицензиар)",
+      LICENSE_CONTRACT_LICENSEE: "Лицензионный договор (лицензиат)",
+    }
+    return types[name] || "Другое"
+  }
+
+  if (isLoading) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+        <Box sx={{ mb: 4 }}>
+          <Skeleton variant="text" width={300} height={40} />
+          <Skeleton variant="text" width={200} height={24} sx={{ mt: 1 }} />
+        </Box>
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
+          </Grid>
+          <Grid item xs={12}>
+            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+          </Grid>
+        </Grid>
+      </Container>
+    )
   }
 
   return (
-    <div className="m-5 space-y-6">
-      <Stack spacing={2} direction="row"  className="flex items-stretch justify-end">
-        <Button
-            variant="destructive"
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+      {/* Breadcrumbs */}
+      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ mb: 3 }}>
+        <Link color="inherit" href="/" underline="hover">
+          Главная
+        </Link>
+        <Link color="inherit" href={`/company/${params.companyId}`} underline="hover">
+          Компания
+        </Link>
+        <Typography color="text.primary">{contractor?.customName || "Контрагент"}</Typography>
+      </Breadcrumbs>
+
+      {/* Header with actions */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
+        <Box>
+          <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+            {contractor?.customName}
+          </Typography>
+          {contractor?.residence && (
+            <Chip
+              label={defineCompanyResidence(contractor.residence)}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
+          )}
+        </Box>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={handleDeleteContractorConfirm}
             size="small"
-            style={{ background: "#78909c" }}
-            className="button-primary mr-10 ml-2"
-            onClick={handleDeleteContractor}
-        >
-          Удалить контрагента
-        </Button>
-        <Button
+          >
+            Удалить контрагента
+          </Button>
+          <Button
             variant="contained"
-            size="small"
-            style={{ background: "#78909c" }}
-            className="button-primary"
+            startIcon={<UploadFileIcon />}
             onClick={() => setIsContractorDocumentUploadDialogOpen(true)}
-        >
-          Загрузить документы
-        </Button>
-      </Stack>
-      <div>
-        {contractor ? (
-          <>
-            <Paper className=" mb-10 w-lg">
-              <Card className="w-lg">
-                <CardHeader>
-                  <Typography variant="h6" gutterBottom>
-                    {contractor.customUserGeneratedName}
+            size="small"
+          >
+            Загрузить документы
+          </Button>
+        </Box>
+      </Box>
+
+      {contractor ? (
+        <Grid container spacing={4}>
+          {/* Contractor Details */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <BusinessIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" component="h2" fontWeight={600}>
+                    Информация о контрагенте
                   </Typography>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-stretch justify-start">
-                    <Typography variant="subtitle2" gutterBottom className="inline">
-                      Страна регистрации: &nbsp;
-                    </Typography>
-                    <Typography variant="body2" gutterBottom className="inline">
-                      {contractor.residence}
-                    </Typography>
-                  </div>
+                </Box>
+                <Divider sx={{ mb: 3 }} />
 
-                  {contractor.fullName &&  <div className="flex items-stretch justify-start">
-                    <Typography variant="subtitle2" gutterBottom className="inline">
-                      Наименование: &nbsp;
-                    </Typography>
-                    <Typography variant="body2" gutterBottom className="inline">
-                      {contractor.fullName}
-                    </Typography>
-                  </div>}
-                  {contractor.inn && contractor.inn !== "null" &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          ИНН: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {contractor.inn}
-                        </Typography>
-                      </div>}
-                  {contractor.ogrn && contractor.ogrn !== "null" &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          ОГРН: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {contractor.ogrn}
-                        </Typography>
-                      </div>}
-                  {contractor.managerTitle &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          Исполнительный орган: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {contractor.managerTitle}
-                        </Typography>
-                      </div>}
-                  {contractor.managerName &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          ФИО исполнительного органа: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {contractor.managerName}
-                        </Typography>
-                      </div>}
-                </CardContent>
-              </Card>
-            </Paper>
+                <Grid container spacing={3}>
+                  {contractor.fullName && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Полное наименование
+                      </Typography>
+                      <Typography variant="body1">{contractor.fullName}</Typography>
+                    </Grid>
+                  )}
+                  {contractor.inn && contractor.inn !== "null" && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        ИНН
+                      </Typography>
+                      <Typography variant="body1">{contractor.inn}</Typography>
+                    </Grid>
+                  )}
+                  {contractor.ogrn && contractor.ogrn !== "null" && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        ОГРН
+                      </Typography>
+                      <Typography variant="body1">{contractor.ogrn}</Typography>
+                    </Grid>
+                  )}
+                  {contractor.residence && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Страна регистрации
+                      </Typography>
+                      <Typography variant="body1">{defineCompanyResidence(contractor.residence)}</Typography>
+                    </Grid>
+                  )}
+                  {contractor.managerTitle && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Исполнительный орган
+                      </Typography>
+                      <Typography variant="body1">{contractor.managerTitle}</Typography>
+                    </Grid>
+                  )}
+                  {contractor.managerName && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        ФИО исполнительного органа
+                      </Typography>
+                      <Typography variant="body1">{contractor.managerName}</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
 
-            <Container className="flex items-center justify-center w-full  mt-10">
-              <Box className="w-full" xl={{ maxWidth: 1200 }}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Документы</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>ID</TableCell>
-                          <TableCell>Наименование</TableCell>
-                          <TableCell>Тип документа</TableCell>
-                          <TableCell>Детали</TableCell>
+          {/* Documents */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Документы
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={() => setIsContractorDocumentUploadDialogOpen(true)}
+                  >
+                    Добавить
+                  </Button>
+                </Box>
+                <Divider sx={{ mb: 3 }} />
+
+                {documents.length > 0 ? (
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Наименование</TableCell>
+                        <TableCell>Тип документа</TableCell>
+                        <TableCell align="right">Действия</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {documents.map((doc) => (
+                        <TableRow key={doc.id} hover>
+                          <TableCell>{doc.name}</TableCell>
+                          <TableCell>{defineDocTypeName(doc.type)}</TableCell>
+                          <TableCell align="right">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => handleViewContractorDocumentDetails(doc.id)}
+                            >
+                              Просмотр
+                            </Button>
+                          </TableCell>
                         </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {documents.map((doc) => (
-                            <TableRow key={doc.id}>
-                              <TableCell>{doc.id}</TableCell>
-                              <TableCell>{doc.name}</TableCell>
-                              <TableCell>{defineDocTypeName(doc.type)}</TableCell>
-                              <TableCell><Button variant="outlined" onClick={() => handleViewContractorDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
-                            </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </Box>
-            </Container>
-
-          </>
-        ) : (
-            <Typography variant="h4">
-              Контрагентов не найдено!
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <Typography color="text.secondary">Документы отсутствуют</Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={() => setIsContractorDocumentUploadDialogOpen(true)}
+                      sx={{ mt: 2 }}
+                    >
+                      Загрузить документы
+                    </Button>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      ) : (
+        <Card>
+          <CardContent sx={{ textAlign: "center", py: 6 }}>
+            <Typography variant="h5" gutterBottom>
+              Контрагент не найден
             </Typography>
-        )}
-        <ContractorDocumentUploadDialog
-          isOpen={isContractorDocumentUploadDialogOpen}
-          onClose={() => setIsContractorDocumentUploadDialogOpen(false)}
-          onUploadSuccess={() => {
-            handleUploadSuccess
-            fetchContractorDocuments()
-          }
-          }
-          onUploadError={handleUploadError}
-          companyId={params.companyId}
-          contractorId={contractor?.id}
-        />
+            <Button variant="contained" component={Link} href={`/company/${params.companyId}`} sx={{ mt: 2 }}>
+              Вернуться к компании
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-      </div>
-      <Snackbar
-          open={openSnack}
-          autoHideDuration={6000}
-          onClose={handleCloseSnack}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
+      {/* Modals */}
+      <ContractorDocumentUploadDialog
+        isOpen={isContractorDocumentUploadDialogOpen}
+        onClose={() => setIsContractorDocumentUploadDialogOpen(false)}
+        onUploadSuccess={handleUploadSuccess}
+        onUploadError={handleUploadError}
+        companyId={params.companyId}
+        contractorId={contractor?.id}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <DialogTitle>Подтверждение удаления</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Вы уверены, что хотите удалить контрагента "{contractor?.customName}"? Это действие нельзя будет отменить.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>Отмена</Button>
+          <Button onClick={handleDeleteContractor} color="error" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleCloseSnack}>
+        <Alert onClose={handleCloseSnack} severity="error" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
       </Snackbar>
-    </div>
+    </Container>
   )
 }
 
