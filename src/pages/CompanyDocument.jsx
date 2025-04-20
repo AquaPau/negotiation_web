@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
 import Container from "@mui/material/Container"
@@ -17,8 +17,10 @@ import Skeleton from "@mui/material/Skeleton"
 import Breadcrumbs from "@mui/material/Breadcrumbs"
 import Link from "@mui/material/Link"
 import DeleteIcon from "@mui/icons-material/Delete"
+import WarningIcon from "@mui/icons-material/Warning"
 import InfoIcon from "@mui/icons-material/Info"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
+import RefreshIcon from "@mui/icons-material/Refresh"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -27,15 +29,22 @@ import DialogTitle from "@mui/material/DialogTitle"
 import CircularProgress from "@mui/material/CircularProgress"
 import Paper from "@mui/material/Paper"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
+import axios from "axios"
 
-const CompanyDocument = () => {
+const ContractorDocument = () => {
   const params = useParams()
   const [doc, setDoc] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isRiskAnalyzing, setIsRiskAnalyzing] = useState(false)
   const [openSnack, setOpenSnack] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [analysisStatus, setAnalysisStatus] = useState({
+    description: { inProgress: false, progress: 0 },
+    risks: { inProgress: false, progress: 0 },
+  })
+  const pollingIntervalRef = useRef(null)
   const navigate = useNavigate()
 
   const handleOpenSnack = () => {
@@ -50,21 +59,77 @@ const CompanyDocument = () => {
   }
 
   useEffect(() => {
-    if (params.companyId && params.documentId) {
-      fetchCompanyDocument()
+    if (params.companyId && params.contractorId && params.documentId) {
+      fetchContractorDocument()
     }
-  }, [params.companyId, params.documentId])
 
-  const fetchCompanyDocument = async () => {
+    return () => {
+      // Очистка интервала при размонтировании компонента
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [params.companyId, params.contractorId, params.documentId])
+
+  // Функция для проверки статуса анализа
+  const checkAnalysisStatus = async () => {
+    try {
+      const response = await axios.get("http://test-api.com/load", {
+        params: { documentId: params.documentId },
+      })
+
+      if (response.data && response.data.status) {
+        // Обновляем статус анализа
+        setAnalysisStatus((prevStatus) => ({
+          description: {
+            inProgress: response.data.description?.inProgress || false,
+            progress: response.data.description?.progress || 0,
+          },
+          risks: {
+            inProgress: response.data.risks?.inProgress || false,
+            progress: response.data.risks?.progress || 0,
+          },
+        }))
+
+        // Если анализ завершен, обновляем документ
+        if (
+          (!response.data.description?.inProgress && analysisStatus.description.inProgress) ||
+          (!response.data.risks?.inProgress && analysisStatus.risks.inProgress)
+        ) {
+          fetchContractorDocument()
+        }
+      }
+    } catch (error) {
+      console.error("Failed to check analysis status:", error)
+    }
+  }
+
+  useEffect(() => {
+    // Запускаем проверку статуса каждые 5 секунд, если идет анализ
+    if (isAnalyzing || isRiskAnalyzing) {
+      pollingIntervalRef.current = setInterval(checkAnalysisStatus, 5000)
+    } else if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current)
+      pollingIntervalRef.current = null
+    }
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [isAnalyzing, isRiskAnalyzing])
+
+  const fetchContractorDocument = async () => {
     setIsLoading(true)
     try {
-      const response = await api.getCompanyDocument(params.companyId, params.documentId)
+      const response = await api.getContractorDocument(params.companyId, params.contractorId, params.documentId)
       setDoc(response.data)
     } catch (error) {
       const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
-      console.error("Failed to fetch company document:", error)
+      console.error("Failed to fetch contractor document:", error)
     } finally {
       setIsLoading(false)
     }
@@ -72,22 +137,49 @@ const CompanyDocument = () => {
 
   const analyseDocumentDescription = async (docId, isRetry) => {
     setIsAnalyzing(true)
+    setAnalysisStatus((prev) => ({
+      ...prev,
+      description: { inProgress: true, progress: 0 },
+    }))
+
     try {
       await api.getDocumentDescription(docId, isRetry)
-      // Fetch updated document after 3 seconds and 1 minute
-      setTimeout(() => {
-        fetchCompanyDocument()
-      }, 3000)
-      setTimeout(() => {
-        fetchCompanyDocument()
-        setIsAnalyzing(false)
-      }, 60000)
+      // Запускаем проверку статуса
+      checkAnalysisStatus()
     } catch (error) {
       const message = error?.response?.data ?? "Ошибка анализа документа"
       setErrorMessage(message)
       handleOpenSnack()
       setIsAnalyzing(false)
+      setAnalysisStatus((prev) => ({
+        ...prev,
+        description: { inProgress: false, progress: 0 },
+      }))
       console.error("Failed to analyze document description:", error)
+    }
+  }
+
+  const analyseDocumentRisks = async (docId, isRetry) => {
+    setIsRiskAnalyzing(true)
+    setAnalysisStatus((prev) => ({
+      ...prev,
+      risks: { inProgress: true, progress: 0 },
+    }))
+
+    try {
+      await api.getDocumentRisks(docId, isRetry)
+      // Запускаем проверку статуса
+      checkAnalysisStatus()
+    } catch (error) {
+      const message = error?.response?.data ?? "Ошибка анализа рисков"
+      setErrorMessage(message)
+      handleOpenSnack()
+      setIsRiskAnalyzing(false)
+      setAnalysisStatus((prev) => ({
+        ...prev,
+        risks: { inProgress: false, progress: 0 },
+      }))
+      console.error("Failed to analyze document risks:", error)
     }
   }
 
@@ -97,9 +189,9 @@ const CompanyDocument = () => {
 
   const handleDeleteDocument = async () => {
     try {
-      await api.deleteCompanyDocument(params.companyId, params.documentId)
+      await api.deleteContractorDocument(params.companyId, params.contractorId, params.documentId)
       setDeleteConfirmOpen(false)
-      navigate(`/company/${params.companyId}`)
+      navigate(`/company/${params.companyId}/contractor/${params.contractorId}`)
     } catch (error) {
       const message = error?.response?.data ?? "Ошибка удаления документа"
       setErrorMessage(message)
@@ -119,7 +211,10 @@ const CompanyDocument = () => {
           <Grid item xs={12}>
             <Skeleton variant="rectangular" height={100} sx={{ borderRadius: 2 }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+          </Grid>
+          <Grid item xs={12} md={6}>
             <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
           </Grid>
         </Grid>
@@ -136,6 +231,9 @@ const CompanyDocument = () => {
         </Link>
         <Link color="inherit" href={`/company/${params.companyId}`} underline="hover">
           Компания
+        </Link>
+        <Link color="inherit" href={`/company/${params.companyId}/contractor/${params.contractorId}`} underline="hover">
+          Контрагент
         </Link>
         <Typography color="text.primary">{doc?.name || "Документ"}</Typography>
       </Breadcrumbs>
@@ -164,36 +262,51 @@ const CompanyDocument = () => {
       {doc ? (
         <Grid container spacing={4}>
           {/* Document Description */}
-          <Grid item xs={12}>
-            <Card>
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: "100%" }}>
               <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <InfoIcon sx={{ mr: 1, color: "primary.main" }} />
-                  <Typography variant="h6" component="h2" fontWeight={600}>
-                    Содержимое документа
-                  </Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <InfoIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Содержимое документа
+                    </Typography>
+                  </Box>
+                  {(doc.description && doc.description.text) || analysisStatus.description.inProgress ? (
+                    <Button
+                      size="small"
+                      startIcon={
+                        analysisStatus.description.inProgress ? <CircularProgress size={16} /> : <RefreshIcon />
+                      }
+                      onClick={() => analyseDocumentDescription(doc.id, true)}
+                      disabled={analysisStatus.description.inProgress}
+                    >
+                      {analysisStatus.description.inProgress
+                        ? `Анализ (${analysisStatus.description.progress}%)`
+                        : "Обновить анализ"}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={() => analyseDocumentDescription(doc.id, false)}
+                      disabled={analysisStatus.description.inProgress}
+                    >
+                      Выполнить анализ
+                    </Button>
+                  )}
                 </Box>
                 <Divider sx={{ mb: 3 }} />
 
-                {isAnalyzing ? (
+                {analysisStatus.description.inProgress ? (
                   <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
                     <CircularProgress size={40} sx={{ mb: 2 }} />
-                    <Typography>Анализ документа...</Typography>
+                    <Typography>Анализ документа... {analysisStatus.description.progress}%</Typography>
                   </Box>
                 ) : doc.description && doc.description.text ? (
-                  <Box>
-                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
-                      <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
-                    </Paper>
-                    <Button
-                      variant="outlined"
-                      onClick={() => analyseDocumentDescription(doc.id, true)}
-                      sx={{ mt: 2 }}
-                      disabled={isAnalyzing}
-                    >
-                      Обновить анализ
-                    </Button>
-                  </Box>
+                  <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                    <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
+                  </Paper>
                 ) : (
                   <Box sx={{ textAlign: "center", py: 4 }}>
                     <Typography color="text.secondary" gutterBottom>
@@ -203,9 +316,72 @@ const CompanyDocument = () => {
                       variant="contained"
                       onClick={() => analyseDocumentDescription(doc.id, false)}
                       sx={{ mt: 2 }}
-                      disabled={isAnalyzing}
+                      disabled={analysisStatus.description.inProgress}
                     >
                       Выполнить анализ
+                    </Button>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Document Risks */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: "100%" }}>
+              <CardContent>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <WarningIcon sx={{ mr: 1, color: "warning.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Риски документа
+                    </Typography>
+                  </Box>
+                  {(doc.risks && doc.risks.text) || analysisStatus.risks.inProgress ? (
+                    <Button
+                      size="small"
+                      startIcon={analysisStatus.risks.inProgress ? <CircularProgress size={16} /> : <RefreshIcon />}
+                      onClick={() => analyseDocumentRisks(doc.id, true)}
+                      disabled={analysisStatus.risks.inProgress}
+                    >
+                      {analysisStatus.risks.inProgress
+                        ? `Анализ (${analysisStatus.risks.progress}%)`
+                        : "Обновить анализ"}
+                    </Button>
+                  ) : (
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={() => analyseDocumentRisks(doc.id, false)}
+                      disabled={analysisStatus.risks.inProgress}
+                    >
+                      Выполнить анализ
+                    </Button>
+                  )}
+                </Box>
+                <Divider sx={{ mb: 3 }} />
+
+                {analysisStatus.risks.inProgress ? (
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
+                    <CircularProgress size={40} sx={{ mb: 2 }} />
+                    <Typography>Анализ рисков... {analysisStatus.risks.progress}%</Typography>
+                  </Box>
+                ) : doc.risks && doc.risks.text ? (
+                  <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                    <MarkdownRenderer>{doc.risks.text}</MarkdownRenderer>
+                  </Paper>
+                ) : (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <Typography color="text.secondary" gutterBottom>
+                      Анализ рисков документа не выполнен
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      onClick={() => analyseDocumentRisks(doc.id, false)}
+                      sx={{ mt: 2 }}
+                      disabled={analysisStatus.risks.inProgress}
+                    >
+                      Выполнить анализ рисков
                     </Button>
                   </Box>
                 )}
@@ -219,8 +395,13 @@ const CompanyDocument = () => {
             <Typography variant="h5" gutterBottom>
               Документ не найден
             </Typography>
-            <Button variant="contained" component={Link} href={`/company/${params.companyId}`} sx={{ mt: 2 }}>
-              Вернуться к компании
+            <Button
+              variant="contained"
+              component={Link}
+              href={`/company/${params.companyId}/contractor/${params.contractorId}`}
+              sx={{ mt: 2 }}
+            >
+              Вернуться к контрагенту
             </Button>
           </CardContent>
         </Card>
@@ -252,4 +433,4 @@ const CompanyDocument = () => {
   )
 }
 
-export default CompanyDocument
+export default ContractorDocument

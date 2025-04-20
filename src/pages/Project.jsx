@@ -37,6 +37,8 @@ import Paper from "@mui/material/Paper"
 import ProjectDocumentUploadDialog from "@/components/ProjectDocumentUploadDialog"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
 import AddIcon from "@mui/icons-material/Add"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import { useTheme } from "@mui/material/styles"
 
 const Project = () => {
   const params = useParams()
@@ -51,6 +53,8 @@ const Project = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const navigate = useNavigate()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
   const handleOpenSnack = () => {
     setOpenSnack(true)
@@ -170,6 +174,9 @@ const Project = () => {
     return types[name] || "Другое"
   }
 
+  // Определяем, нужно ли отображать описание и документы в одну строку
+  const shouldDisplayInRow = documents.length > 0 && documents.length <= 3 && !isMobile
+
   if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
@@ -212,7 +219,7 @@ const Project = () => {
             ID: {projectData?.id}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: "flex-end" }}>
           <Button
             variant="outlined"
             color="error"
@@ -222,6 +229,21 @@ const Project = () => {
           >
             Удалить проект
           </Button>
+
+          {/* Кнопка анализа проекта */}
+          {documents.length > 0 && (
+            <Button
+              variant={projectResult ? "outlined" : "contained"}
+              color="primary"
+              startIcon={isResultLoading ? <CircularProgress size={16} /> : <AnalyticsIcon />}
+              onClick={() => analyseProject(projectResult ? true : false)}
+              disabled={isResultLoading}
+              size="small"
+            >
+              {isResultLoading ? "Анализ..." : projectResult ? "Повторить анализ" : "Проанализировать проект"}
+            </Button>
+          )}
+
           <Button
             variant="contained"
             startIcon={<UploadFileIcon />}
@@ -234,149 +256,144 @@ const Project = () => {
       </Box>
 
       {projectData ? (
-        <Grid container spacing={4}>
+        <>
           {/* Project Description */}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <AssignmentIcon sx={{ mr: 1, color: "primary.main" }} />
-                  <Typography variant="h6" component="h2" fontWeight={600}>
-                    Описание ситуации
-                  </Typography>
-                </Box>
-                <Divider sx={{ mb: 3 }} />
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <AssignmentIcon sx={{ mr: 1, color: "primary.main" }} />
+                <Typography variant="h6" component="h2" fontWeight={600}>
+                  Описание ситуации
+                </Typography>
+              </Box>
+              <Divider sx={{ mb: 3 }} />
 
-                <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
-                  <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
-                    {projectData.userGeneratedPrompt}
-                  </Typography>
-                </Paper>
-              </CardContent>
-            </Card>
-          </Grid>
+              <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+                  {projectData.userGeneratedPrompt}
+                </Typography>
+              </Paper>
+            </CardContent>
+          </Card>
 
-          {/* Project Analysis Results */}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <AnalyticsIcon sx={{ mr: 1, color: "primary.main" }} />
-                  <Typography variant="h6" component="h2" fontWeight={600}>
-                    Результаты анализа проекта
-                  </Typography>
-                </Box>
-                <Divider sx={{ mb: 3 }} />
+            {/* Documents */}
 
-                {isResultLoading ? (
-                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
-                    <CircularProgress size={40} sx={{ mb: 2 }} />
-                    <Typography>Происходит анализ проекта...</Typography>
+              <Card sx={{ height: "100%" }}>
+                <CardContent>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                      <Typography variant="h6" component="h2" fontWeight={600}>
+                        Документы
+                      </Typography>
+                    </Box>
+                    <Button
+                      size="small"
+                      startIcon={<AddIcon />}
+                      onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
+                    >
+                      Добавить
+                    </Button>
                   </Box>
-                ) : projectResult ? (
-                  <Box>
-                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
+                  <Divider sx={{ mb: 3 }} />
+
+                  {documents.length > 0 ? (
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>ID</TableCell>
+                          <TableCell>Наименование</TableCell>
+                          <TableCell>Тип документа</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {documents.map((doc) => (
+                          <TableRow key={doc.id} hover>
+                            <TableCell>{doc.id}</TableCell>
+                            <TableCell>{doc.name}</TableCell>
+                            <TableCell>{defineDocTypeName(doc.type)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <Box sx={{ textAlign: "center", py: 4 }}>
+                      <Typography color="text.secondary">Документы отсутствуют</Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<UploadFileIcon />}
+                        onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
+                        sx={{ mt: 2 }}
+                      >
+                        Загрузить документы
+                      </Button>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+
+
+          {/* Динамическое отображение описания и документов */}
+          <Grid container spacing={4}>
+            {/* Project Analysis Results */}
+            <Grid item xs={12} md={shouldDisplayInRow ? 6 : 12}>
+              <Card sx={{ height: "100%" }}>
+                <CardContent>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <AnalyticsIcon sx={{ mr: 1, color: "primary.main" }} />
+                      <Typography variant="h6" component="h2" fontWeight={600}>
+                        Результаты анализа проекта
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Divider sx={{ mb: 3 }} />
+
+                  {isResultLoading ? (
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
+                      <CircularProgress size={40} sx={{ mb: 2 }} />
+                      <Typography>Происходит анализ проекта...</Typography>
+                    </Box>
+                  ) : projectResult ? (
+                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
                       <MarkdownRenderer>{projectResult}</MarkdownRenderer>
                     </Paper>
-                    <Button
-                      variant="outlined"
-                      onClick={() => analyseProject(true)}
-                      sx={{ mt: 2 }}
-                      disabled={isResultLoading}
-                    >
-                      Повторить анализ
-                    </Button>
-                  </Box>
-                ) : documents.length > 0 ? (
-                  <Box sx={{ textAlign: "center", py: 4 }}>
-                    <Typography color="text.secondary" gutterBottom>
-                      Анализ проекта не выполнен
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      onClick={() => analyseProject(false)}
-                      sx={{ mt: 2 }}
-                      disabled={isResultLoading}
-                    >
-                      Проанализировать проект
-                    </Button>
-                  </Box>
-                ) : (
-                  <Box sx={{ textAlign: "center", py: 4 }}>
-                    <Typography color="text.secondary">
-                      Для анализа проекта требуется загрузить как минимум один документ
-                    </Typography>
-                    <Button
-                      variant="outlined"
-                      startIcon={<UploadFileIcon />}
-                      onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
-                      sx={{ mt: 2 }}
-                    >
-                      Загрузить документы
-                    </Button>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+                  ) : documents.length > 0 ? (
+                    <Box sx={{ textAlign: "center", py: 4 }}>
+                      <Typography color="text.secondary" gutterBottom>
+                        Анализ проекта не выполнен
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        onClick={() => analyseProject(false)}
+                        sx={{ mt: 2 }}
+                        disabled={isResultLoading}
+                      >
+                        Проанализировать проект
+                      </Button>
+                    </Box>
+                  ) : (
+                    <Box sx={{ textAlign: "center", py: 4 }}>
+                      <Typography color="text.secondary">
+                        Для анализа проекта требуется загрузить как минимум один документ
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<UploadFileIcon />}
+                        onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
+                        sx={{ mt: 2 }}
+                      >
+                        Загрузить документы
+                      </Button>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
 
-          {/* Documents */}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
-                    <Typography variant="h6" component="h2" fontWeight={600}>
-                      Документы
-                    </Typography>
-                  </Box>
-                  <Button
-                    size="small"
-                    startIcon={<AddIcon />}
-                    onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
-                  >
-                    Добавить
-                  </Button>
-                </Box>
-                <Divider sx={{ mb: 3 }} />
 
-                {documents.length > 0 ? (
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Наименование</TableCell>
-                        <TableCell>Тип документа</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {documents.map((doc) => (
-                        <TableRow key={doc.id} hover>
-                          <TableCell>{doc.id}</TableCell>
-                          <TableCell>{doc.name}</TableCell>
-                          <TableCell>{defineDocTypeName(doc.type)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Box sx={{ textAlign: "center", py: 4 }}>
-                    <Typography color="text.secondary">Документы отсутствуют</Typography>
-                    <Button
-                      variant="outlined"
-                      startIcon={<UploadFileIcon />}
-                      onClick={() => setIsProjectDocumentUploadDialogOpen(true)}
-                      sx={{ mt: 2 }}
-                    >
-                      Загрузить документы
-                    </Button>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
           </Grid>
-        </Grid>
+        </>
       ) : (
         <Card>
           <CardContent sx={{ textAlign: "center", py: 6 }}>
