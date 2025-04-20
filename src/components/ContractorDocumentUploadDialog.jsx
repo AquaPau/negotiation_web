@@ -1,58 +1,56 @@
 "use client"
 
 import { useState, useRef } from "react"
-import {Dialog, DialogContent, DialogTitle, DialogActions} from "@mui/material"
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import { styled } from '@mui/material/styles';
-import Select from '@mui/material/Select';
-import Button from '@mui/material/Button';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from '@mui/icons-material/Close';
-import TextField from "@mui/material/TextField";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
+import { Dialog, DialogContent, DialogTitle, DialogActions } from "@mui/material"
+import Table from "@mui/material/Table"
+import TableBody from "@mui/material/TableBody"
+import TableCell from "@mui/material/TableCell"
+import TableHead from "@mui/material/TableHead"
+import TableRow from "@mui/material/TableRow"
+import { styled } from "@mui/material/styles"
+import Select from "@mui/material/Select"
+import Button from "@mui/material/Button"
+import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import IconButton from "@mui/material/IconButton"
+import CloseIcon from "@mui/icons-material/Close"
+import FormControl from "@mui/material/FormControl"
+import InputLabel from "@mui/material/InputLabel"
+import MenuItem from "@mui/material/MenuItem"
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
+import Alert from "@mui/material/Alert"
+import DeleteIcon from "@mui/icons-material/Delete"
+import Tooltip from "@mui/material/Tooltip"
 import { api } from "@/api/api"
 
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
   height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
+  overflow: "hidden",
+  position: "absolute",
   bottom: 0,
   left: 0,
-  whiteSpace: 'nowrap',
+  whiteSpace: "nowrap",
   width: 1,
-});
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  shadow: '6px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
+})
 
-const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploadError, companyId, contractorId }) => {
+const ContractorDocumentUploadDialog = ({
+  isOpen,
+  onClose,
+  onUploadSuccess,
+  onUploadError,
+  companyId,
+  contractorId,
+}) => {
   const [selectedFiles, setSelectedFiles] = useState([])
+  const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files).map((file) => ({
       file,
-      type: "CORPORATE",
+      type: "DEFAULT",
     }))
     setSelectedFiles((prev) => [...prev, ...newFiles])
   }
@@ -66,18 +64,20 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
   }
 
   const handleUpload = async () => {
+    if (selectedFiles.length === 0) return
+
+    setUploading(true)
     try {
       const files = selectedFiles.map((sf) => sf.file)
       const types = selectedFiles.map((sf) => sf.type)
 
       await api.uploadContractorDocuments(companyId, contractorId, files, types)
-      onUploadSuccess("Files uploaded successfully!")
+      onUploadSuccess("Файлы успешно загружены!")
 
       // Fetch updated file list after 3 seconds
       setTimeout(async () => {
         try {
           const updatedFiles = await api.getContractorDocuments(companyId, contractorId)
-          // Handle the updated file list (e.g., update state in parent component)
           console.log("Updated files:", updatedFiles)
         } catch (error) {
           console.error("Error fetching updated files:", error)
@@ -86,108 +86,134 @@ const ContractorDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUp
 
       onClose()
     } catch (error) {
-      onUploadError("Error uploading files: " + error.message)
+      onUploadError("Ошибка загрузки файлов: " + error.message)
+    } finally {
+      setUploading(false)
     }
   }
 
-  const handleAddMoreFiles = () => {
-    fileInputRef.current.click()
-  }
+  const documentTypes = [
+    { value: "LABOR_CONTRACT_EMPLOYER", label: "Трудовой договор (сторона - работодатель)" },
+    { value: "REAL_ESTATE_LEASE_CONTRACT_LANDLORD", label: "Договор аренды недвижимости (сторона - арендодатель)" },
+    { value: "REAL_ESTATE_LEASE_CONTRACT_TENANT", label: "Договор аренды недвижимости (сторона - арендатор)" },
+    { value: "SALES_CONTRACT_SELLER", label: "Договор купли-продажи/поставки (сторона - продавец/поставщик)" },
+    { value: "SALES_CONTRACT_CUSTOMER", label: "Договор купли-продажи/поставки (сторона - покупатель)" },
+    { value: "REAL_ESTATE_SALES_CONTRACT_SELLER", label: "Договор купли-продажи недвижимости (сторона - продавец)" },
+    {
+      value: "REAL_ESTATE_SALES_CONTRACT_CUSTOMER",
+      label: "Договор купли-продажи недвижимости (сторона - покупатель)",
+    },
+    { value: "SERVICE_CONTRACT_CONTRACTOR", label: "Договор оказания услуг/выполнения работ (сторона - исполнитель)" },
+    { value: "SERVICE_CONTRACT_CUSTOMER", label: "Договор оказания услуг/выполнения работ (сторона - заказчик)" },
+    { value: "LICENSE_CONTRACT_LICENSOR", label: "Лицензионный договор (сторона - лицензиар)" },
+    { value: "LICENSE_CONTRACT_LICENSEE", label: "Лицензионный договор (сторона - лицензиат)" },
+    { value: "DEFAULT", label: "Иные документы" },
+  ]
 
   return (
-    <Dialog fullWidth maxWidth="md" open={isOpen} onOpenChange={onClose}>
-        <div className="flex justify-between">
-          <DialogTitle>Загрузить документы</DialogTitle>
-          <IconButton
-              aria-label="close"
-              onClick={onClose}
-              sx={(theme) => ({
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                color: theme.palette.grey[500],
-              })}
-          >
+    <Dialog
+      fullWidth
+      maxWidth="md"
+      open={isOpen}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+        },
+      }}
+    >
+      <DialogTitle sx={{ pb: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="h5" component="h2" fontWeight={600}>
+            Загрузить документы контрагента
+          </Typography>
+          <IconButton aria-label="close" onClick={onClose} sx={{ color: "text.secondary" }}>
             <CloseIcon />
           </IconButton>
-        </div>
-        <DialogContent>
-          <div className="grid gap-4 py-4">
-            <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-            >
-              {selectedFiles.length > 0 ? "Добавить еще" : "Выбрать файл"}
-              <VisuallyHiddenInput
-                  ref={fileInputRef}
-                  type="file"
-                  id="files"
-                  multiple
-                  onChange={handleFileChange}
-              />
-            </Button>
-            {selectedFiles.length > 0 && (
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Название</TableCell>
-                      <TableCell>Тип</TableCell>
-                      <TableCell>Действие</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {selectedFiles.map((file, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{file.file.name}</TableCell>
-                          <TableCell>
-                            <FormControl variant="standard" className="input-field w-full">
-                              <InputLabel id="" className="block text-sm font-medium text-gray-700">Тип документа</InputLabel>
-                              <Select
-                                  labelId="demo-simple-select-standard-label"
-                                  id="demo-simple-select-standard"
-                                  value={file.type}
-                                  onChange={(value) => handleTypeChange(index, value)}
-                                  label="Тип документа"
-                              >
-                                <MenuItem value="LABOR_CONTRACT_EMPLOYER">Трудовой договор (сторона - работодатель)</MenuItem>
-                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT_LANDLORD">Договор аренды недвижимости (сторона - арендодатель)</MenuItem>
-                                <MenuItem value="REAL_ESTATE_LEASE_CONTRACT_TENANT">Договор аренды недвижимости (сторона - арендатор)</MenuItem>
-                                <MenuItem value="SALES_CONTRACT_SELLER">Договор купли-продажи/поставки (сторона - продавец/поставщик)</MenuItem>
-                                <MenuItem value="SALES_CONTRACT_CUSTOMER">Договор купли-продажи/поставки (сторона - покупатель)</MenuItem>
-                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT_SELLER">Договор купли-продажи недвижимости (сторона - продавец)</MenuItem>
-                                <MenuItem value="REAL_ESTATE_SALES_CONTRACT_CUSTOMER">Договор купли-продажи недвижимости (сторона - покупатель)</MenuItem>
-                                <MenuItem value="SERVICE_CONTRACT_CONTRACTOR">Договор оказания услуг/выполнения работ (сторона - исполнитель)</MenuItem>
-                                <MenuItem value="SERVICE_CONTRACT_CUSTOMER">Договор оказания услуг/выполнения работ (сторона - заказчик)</MenuItem>
-                                <MenuItem value="LICENSE_CONTRACT_LICENSOR">Лицензионный договор (сторона - лицензиар)</MenuItem>
-                                <MenuItem value="LICENSE_CONTRACT_LICENSEE">Лицензионный договор (сторона - лицензиат)</MenuItem>
-                                <MenuItem value="DEFAULT">Иные документы</MenuItem>
-                              </Select>
-                            </FormControl>
-                          </TableCell>
-                          <TableCell>
-                            <Button variant="destructive" onClick={() => handleDelete(index)}>
-                              Удалить
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-            )}
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" className="button-primary" onClick={handleUpload} disabled={selectedFiles.length === 0}>
-            Загрузить
+        </Box>
+      </DialogTitle>
+      <DialogContent>
+        <Box sx={{ mt: 2, mb: 3 }}>
+          <Button
+            component="label"
+            variant="outlined"
+            startIcon={<CloudUploadIcon />}
+            sx={{ mb: 2 }}
+            disabled={uploading}
+          >
+            {selectedFiles.length > 0 ? "Добавить еще файлы" : "Выбрать файлы"}
+            <VisuallyHiddenInput ref={fileInputRef} type="file" id="files" multiple onChange={handleFileChange} />
           </Button>
-        </DialogActions>
 
+          {selectedFiles.length === 0 && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              Выберите файлы для загрузки
+            </Alert>
+          )}
+
+          {selectedFiles.length > 0 && (
+            <Table sx={{ mt: 2 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell width="40%">Название файла</TableCell>
+                  <TableCell width="50%">Тип документа</TableCell>
+                  <TableCell width="10%" align="center">
+                    Действия
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {selectedFiles.map((file, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{file.file.name}</TableCell>
+                    <TableCell>
+                      <FormControl fullWidth variant="outlined" size="small">
+                        <InputLabel id={`document-type-label-${index}`}>Тип документа</InputLabel>
+                        <Select
+                          labelId={`document-type-label-${index}`}
+                          id={`document-type-${index}`}
+                          value={file.type}
+                          onChange={(e) => handleTypeChange(index, e.target.value)}
+                          label="Тип документа"
+                        >
+                          {documentTypes.map((type) => (
+                            <MenuItem key={type.value} value={type.value}>
+                              {type.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Удалить">
+                        <IconButton color="error" size="small" onClick={() => handleDelete(index)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 3 }}>
+        <Button variant="outlined" onClick={onClose} disabled={uploading}>
+          Отменить
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleUpload}
+          disabled={selectedFiles.length === 0 || uploading}
+          startIcon={uploading && <CloudUploadIcon />}
+        >
+          {uploading ? "Загрузка..." : "Загрузить"}
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }
 
 export default ContractorDocumentUploadDialog
-

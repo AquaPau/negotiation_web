@@ -1,33 +1,17 @@
-import { useState, useEffect } from "react"
-import {DialogContent, DialogTitle, DialogActions, Dialog} from "@mui/material"
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
+"use client"
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  shadow: '6px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
+import { useState } from "react"
+import { DialogContent, DialogTitle, DialogActions, Dialog } from "@mui/material"
+import Button from "@mui/material/Button"
+import TextField from "@mui/material/TextField"
+import IconButton from "@mui/material/IconButton"
+import CloseIcon from "@mui/icons-material/Close"
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
 
 const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
   const [projectName, setProjectName] = useState("")
   const [userPrompt, setUserPrompt] = useState("")
-
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -35,64 +19,63 @@ const CreateProjectModal = ({ isOpen, onClose, onCreateProject }) => {
   }
 
   return (
-      <Dialog fullWidth maxWidth="md" open={isOpen} onOpenChange={onClose}>
-          <div className="flex justify-between">
-            <DialogTitle>Создать новую компанию</DialogTitle>
-            <IconButton
-                aria-label="close"
-                onClick={onClose}
-                sx={(theme) => ({
-                  position: 'absolute',
-                  right: 8,
-                  top: 8,
-                  color: theme.palette.grey[500],
-                })}
-            >
-              <CloseIcon />
-            </IconButton>
-          </div>
+    <Dialog
+      fullWidth
+      maxWidth="sm"
+      open={isOpen}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+        },
+      }}
+    >
+      <DialogTitle sx={{ pb: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="h5" component="h2" fontWeight={600}>
+            Создать новый проект
+          </Typography>
+          <IconButton aria-label="close" onClick={onClose} sx={{ color: "text.secondary" }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <TextField
-                id="projectName"
-                required
-                className="input-field w-full"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                label="Название проекта"
-                variant="standard"
-            />
-          </div>
-          <div>
-            <TextField
-                id="userPrompt"
-                required
-                className="input-field w-full"
-                value={userPrompt}
-                onChange={(e) => setUserPrompt(e.target.value)}
-                label="Описание проекта: какой стороной договора вы являетесь, описание ситуации и запрос"
-                variant="standard"
-            />
-          </div>
-          <DialogActions>
-            <Button
-                variant="contained"
-                type="submit"
-                className="button-primary"
-            >
-              Создать проект
-            </Button>
-            <Button
-                variant="outlined"
-                type="submit"
-                onClick={onClose}
-                className="button-primary"
-            >
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            id="projectName"
+            required
+            fullWidth
+            margin="normal"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            label="Название проекта"
+            variant="outlined"
+            autoFocus
+          />
+          <TextField
+            id="userPrompt"
+            required
+            fullWidth
+            margin="normal"
+            value={userPrompt}
+            onChange={(e) => setUserPrompt(e.target.value)}
+            label="Описание проекта"
+            variant="outlined"
+            multiline
+            rows={4}
+            helperText="Опишите какой стороной договора вы являетесь, ситуацию и ваш запрос"
+          />
+          <DialogActions sx={{ px: 0, pt: 3 }}>
+            <Button variant="outlined" onClick={onClose}>
               Отменить
             </Button>
+            <Button variant="contained" type="submit">
+              Создать проект
+            </Button>
           </DialogActions>
-        </form>
+        </Box>
       </DialogContent>
     </Dialog>
   )
