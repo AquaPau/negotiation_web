@@ -122,12 +122,7 @@ const Project = () => {
   //todo scheduler to catch the analyse of the project
 
   const defineDocTypeName = (name) => {
-    const answer = name == "LABOR_CONTRACT" ?  "Трудовой договор"
-        : name == "REAL_ESTATE_LEASE_CONTRACT" ?  "Договор аренды недвижимости"
-        : name == "SALES_CONTRACT" ? "Договор купли-продажи"
-        : name == "REAL_ESTATE_SALES_CONTRACT" ? "Договор купли-продажи недвижимости"
-        : name == "SERVICE_CONTRACT" ? "Договор услуг/работ"
-        : name == "LICENSE_CONTRACT" ? "Лицензионный договор"
+    const answer = name == "DEFAULT" ?  "Проектный документ"
         : "Другое"
         return answer
   }
