@@ -121,5 +121,11 @@ export const api = {
   getDocumentRisks: (id, retry) => axiosInstance.get(`/analyse/document/${id}/risks?retry=${retry}`),
   getProjectResolution: (id, retry) => axiosInstance.get(`/analyse/project/${id}/resolution?retry=${retry}`),
 
+  // Dialogs TBD
+  getUserDialogs: () => axiosInstance.get(`/dialog`),
+  createDialog: (dialogData) => axiosInstance.post(`/dialog`, dialogData),
+  getDialog: (dialogId) => axiosInstance.get(`/dialog/${dialogId}`),
+  deleteDialog: (dialogId) => axiosInstance.delete(`/dialog/${dialogId}`),
+
 }
 
