@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import CreateContractorModal from "@/components/CreateContractorModal"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import CompanyDocumentUploadDialog from "@/components/CompanyDocumentUploadDialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+import CreateContractorModal from "@/components/CreateContractorModal"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Card from '@mui/material/Card';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import CompanyDocumentUploadDialog from "@/components/CompanyDocumentUploadDialog"
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Company = () => {
 
@@ -20,6 +33,17 @@ const Company = () => {
   const [uploadMessage, setUploadMessage] = useState("")
   const navigate = useNavigate()
 
+  const [openSnack, setOpenSnack] = useState(false)
+  const handleOpenSnack = () => {
+    setOpenSnack(true);
+  };
+  const handleCloseSnack = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnack(false);
+  };
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (params.companyId) {
@@ -47,6 +71,9 @@ const Company = () => {
       console.log(response.data)
       setCompanyData(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch user company data:", error)
       setCompanyData(null)
     } finally {
@@ -59,6 +86,9 @@ const Company = () => {
       const response = await api.getCompanyDocuments(companyData.id)
       setDocuments(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch company documents:", error)
     }
   }
@@ -69,6 +99,9 @@ const Company = () => {
       const response = await api.getContractors(companyData.id)
       setContractorsList(response.data)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to fetch company contractor list:", error)
       setContractorsList([])
     } finally {
@@ -94,6 +127,9 @@ const Company = () => {
         fetchCompanyContractors()
       }, 120000)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to create company:", error)
     }
   }
@@ -110,6 +146,9 @@ const Company = () => {
         }, 60000)
 
       } catch (error) {
+        const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+        setErrorMessage(message)
+        handleOpenSnack()
         console.log("Failed to catch the document insights: " + docId)
       }
     }
@@ -119,6 +158,9 @@ const Company = () => {
       const url = `/company/${companyData.id}/contractor/${contractorId}`
       navigate(url)
     } else {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Company data about contractor or ID is missing")
     }
   }
@@ -137,6 +179,9 @@ const Company = () => {
       await api.deleteCompany(companyData)
       navigate(`/`)
     } catch (error) {
+      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      setErrorMessage(message)
+      handleOpenSnack()
       console.error("Failed to delete company:", error)
     }
   }
@@ -175,90 +220,178 @@ const Company = () => {
   }
 
   return (
-    <div className="space-y-6">
-          <div className="flex items-stretch justify-end">
-            <Button className="link bg-stone-300" onClick={handleDeleteCompany}>Удалить компанию</Button>
-            <Button className="link bg-stone-300" onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}>Загрузить документы</Button>
-            <Button className="link bg-stone-300" onClick={() => setIsCreateContractorModalOpen(true)}>Создать нового контрагента</Button>
-          </div>
-      <div flex items-center justify-between>
+    <div className="m-5 space-y-6">
+      <Stack spacing={2} direction="row"  className="flex items-stretch justify-end">
+        <Button
+            variant="destructive"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary mr-10 ml-2"
+            onClick={handleDeleteCompany}
+        >
+          Удалить компанию
+        </Button>
+        <Button
+            variant="contained"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary"
+            onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
+        >
+          Загрузить документы
+        </Button>
+        <Button
+            variant="contained"
+            size="small"
+            style={{ background: "#78909c" }}
+            className="button-primary"
+            onClick={() => setIsCreateContractorModalOpen(true)}
+        >
+          Создать нового контрагента
+        </Button>
+      </Stack>
+      <div>
         {companyData ? (
           <>
-            <Card>
-              <CardHeader>
-                <CardTitle>{companyData.customUserGeneratedName}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Страна регистрации: {defineCompanyResidence(companyData.residence)}</p>
-                {companyData.fullName && <p>Наименование: {companyData.fullName}</p>}
-                {companyData.inn && companyData.inn !== "null" && <p>ИНН: {companyData.inn}</p>}
-                {companyData.ogrn && companyData.ogrn !== "null" && <p>ОГРН: {companyData.ogrn}</p>}
-                {companyData.managerTitle && <p>Исполнительный орган: {companyData.managerTitle}</p>}
-                {companyData.managerName && <p>ФИО исполнительного органа: {companyData.managerName}</p>}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Документы</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Наименование</TableHead>
-                      <TableHead>Детали</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {documents.map((doc) => (
-                      <TableRow key={doc.id}>
-                        <TableCell>{doc.id}</TableCell>
-                        <TableCell>{doc.name}</TableCell>
-                        <TableCell>{defineDocTypeName(doc.type)}</TableCell>
-                        <TableCell><Button className="outline" onClick={() => handleViewCompanyDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-            <Card className="mt-4">
-              <CardHeader>
-                <CardTitle>Контрагенты</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {contractorsList.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Пользовательское название контрагента</TableHead>
-                        <TableHead>Детали</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {contractorsList.map((contr) => (
-                        <TableRow key={contr.id}>
-                          <TableCell>{contr.id}</TableCell>
-                          <TableCell>{contr.customName}</TableCell>
-                          <TableCell><Button className="outline" onClick={() => handleViewContractorsDetails(contr.id)}>Данные контрагента</Button></TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
+            <Paper className=" mb-10 w-lg">
+              <Card className="w-lg">
+                <CardHeader>
+                  <Typography variant="h6" gutterBottom>
+                    {companyData.customUserGeneratedName}
+                  </Typography>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-stretch justify-start">
+                    <Typography variant="subtitle2" gutterBottom className="inline">
+                      Страна регистрации: &nbsp;
+                    </Typography>
+                    <Typography variant="body2" gutterBottom className="inline">
+                      {companyData.residence}
+                    </Typography>
+                  </div>
+
+                  {companyData.fullName &&  <div className="flex items-stretch justify-start">
+                    <Typography variant="subtitle2" gutterBottom className="inline">
+                      Наименование: &nbsp;
+                    </Typography>
+                    <Typography variant="body2" gutterBottom className="inline">
+                      {companyData.fullName}
+                    </Typography>
+                  </div>}
+                  {companyData.inn && companyData.inn !== "null" &&
+                      <div className="flex items-stretch justify-start">
+                        <Typography variant="subtitle2" gutterBottom className="inline">
+                          ИНН: &nbsp;
+                        </Typography>
+                        <Typography variant="body2" gutterBottom className="inline">
+                          {companyData.inn}
+                        </Typography>
+                      </div>}
+                  {companyData.ogrn && companyData.ogrn !== "null" &&
+                      <div className="flex items-stretch justify-start">
+                        <Typography variant="subtitle2" gutterBottom className="inline">
+                          ОГРН: &nbsp;
+                        </Typography>
+                        <Typography variant="body2" gutterBottom className="inline">
+                          {companyData.ogrn}
+                        </Typography>
+                      </div>}
+                  {companyData.managerTitle &&
+                      <div className="flex items-stretch justify-start">
+                        <Typography variant="subtitle2" gutterBottom className="inline">
+                          Исполнительный орган: &nbsp;
+                        </Typography>
+                        <Typography variant="body2" gutterBottom className="inline">
+                          {companyData.managerTitle}
+                        </Typography>
+                      </div>}
+                  {companyData.managerName &&
+                      <div className="flex items-stretch justify-start">
+                        <Typography variant="subtitle2" gutterBottom className="inline">
+                          ФИО исполнительного органа: &nbsp;
+                        </Typography>
+                        <Typography variant="body2" gutterBottom className="inline">
+                          {companyData.managerName}
+                        </Typography>
+                      </div>}
+                </CardContent>
+              </Card>
+            </Paper>
+
+            <Container className="flex items-center justify-center w-full  mt-10">
+              <Box className="w-full" xl={{ maxWidth: 1200 }}>
+                <Card>
                   <CardHeader>
-                    <CardTitle> Контрагентов не найдено </CardTitle>
+                    <CardTitle>Документы</CardTitle>
                   </CardHeader>
-                )
-                }
-              </CardContent>
-            </Card>
+                  <CardContent>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>ID</TableCell>
+                          <TableCell>Наименование</TableCell>
+                          <TableCell>Детали</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {documents.map((doc) => (
+                            <TableRow key={doc.id}>
+                              <TableCell>{doc.id}</TableCell>
+                              <TableCell>{doc.name}</TableCell>
+                              <TableCell>{defineDocTypeName(doc.type)}</TableCell>
+                              <TableCell><Button variant="outlined" onClick={() => handleViewCompanyDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
+                            </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </Box>
+            </Container>
+
+
+            <Container className="flex items-center justify-center w-full  mt-10">
+              <Box className="w-full" xl={{ maxWidth: 1200 }}>
+                <Card className="mt-4">
+                  <CardHeader>
+                    <CardTitle>Контрагенты</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {contractorsList.length > 0 ? (
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>ID</TableCell>
+                              <TableCell>Пользовательское название контрагента</TableCell>
+                              <TableCell>Детали</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {contractorsList.map((contr) => (
+                                <TableRow key={contr.id}>
+                                  <TableCell>{contr.id}</TableCell>
+                                  <TableCell>{contr.customName}</TableCell>
+                                  <TableCell><Button className="outline" onClick={() => handleViewContractorsDetails(contr.id)}>Данные контрагента</Button></TableCell>
+                                </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                    ) : (
+                        <Typography variant="h5">
+                          Контрагентов не найдено
+                        </Typography>
+                      )
+                    }
+                  </CardContent>
+                </Card>
+              </Box>
+            </Container>
+
           </>) : (
-          <CardHeader>
-            <CardTitle> Компания не найдена! </CardTitle>
-          </CardHeader>)}
+            <Typography variant="h4">
+              Компания не найдена!
+            </Typography>
+          )}
         <CompanyDocumentUploadDialog
           isOpen={isCompanyDocumentUploadDialogOpen}
           onClose={() => setIsCompanyDocumentUploadDialogOpen(false)}
@@ -277,6 +410,13 @@ const Company = () => {
       />
       </div>
 
+      <Snackbar
+          open={openSnack}
+          autoHideDuration={6000}
+          onClose={handleCloseSnack}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </div>
   );
 };
