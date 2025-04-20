@@ -192,14 +192,14 @@ const Contractor = () => {
         <Link color="inherit" href={`/company/${params.companyId}`} underline="hover">
           Компания
         </Link>
-        <Typography color="text.primary">{contractor?.customName || "Контрагент"}</Typography>
+        <Typography color="text.primary">{contractor?.customUserGeneratedName || "Контрагент"}</Typography>
       </Breadcrumbs>
 
       {/* Header with actions */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 4 }}>
         <Box sx={{ maxWidth: "70%" }}>
           <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-            {contractor?.customName || "Контрагент не найден"}
+            {contractor?.customUserGeneratedName || "Контрагент не найден"}
           </Typography>
           {contractor?.residence && (
             <Chip
@@ -372,7 +372,7 @@ const Contractor = () => {
         <DialogTitle>Подтверждение удаления</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Вы уверены, что хотите удалить контрагента "{contractor?.customName}"? Это действие нельзя будет отменить.
+            Вы уверены, что хотите удалить контрагента "{contractor?.customUserGeneratedName}"? Это действие нельзя будет отменить.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
