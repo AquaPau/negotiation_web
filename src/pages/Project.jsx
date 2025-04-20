@@ -278,7 +278,7 @@ const Project = () => {
 
             {/* Documents */}
 
-              <Card sx={{ height: "100%" }}>
+              <Card sx={{ mb: 4 }}>
                 <CardContent>
                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -334,10 +334,7 @@ const Project = () => {
 
 
           {/* Динамическое отображение описания и документов */}
-          <Grid container spacing={4}>
-            {/* Project Analysis Results */}
-            <Grid item xs={12} md={shouldDisplayInRow ? 6 : 12}>
-              <Card sx={{ height: "100%" }}>
+          <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -389,10 +386,6 @@ const Project = () => {
                   )}
                 </CardContent>
               </Card>
-            </Grid>
-
-
-          </Grid>
         </>
       ) : (
         <Card>

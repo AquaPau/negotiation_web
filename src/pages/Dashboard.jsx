@@ -34,8 +34,10 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const [openSnack, setOpenSnack] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null)
-  const [selectedItemId, setSelectedItemId] = useState(null)
+  const [menuAnchorElCompany, setMenuAnchorElCompany] = useState(null)
+  const [selectedItemIdCompany, setSelectedItemIdCompany] = useState(null)
+  const [menuAnchorElProject, setMenuAnchorElProject] = useState(null)
+  const [selectedItemIdProject, setSelectedItemIdProject] = useState(null)
 
   const handleOpenSnack = () => {
     setOpenSnack(true)
@@ -48,14 +50,24 @@ const Dashboard = () => {
     setOpenSnack(false)
   }
 
-  const handleMenuOpen = (event, id) => {
-    setMenuAnchorEl(event.currentTarget)
-    setSelectedItemId(id)
+  const handleMenuOpenCompany = (event, id) => {
+    setMenuAnchorElCompany(event.currentTarget)
+    setSelectedItemIdCompany(id)
   }
 
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null)
-    setSelectedItemId(null)
+  const handleMenuOpenProject = (event, id) => {
+    setMenuAnchorElProject(event.currentTarget)
+    setSelectedItemIdProject(id)
+  }
+
+  const handleMenuCloseCompany = () => {
+    setMenuAnchorElCompany(null)
+    setSelectedItemIdCompany(null)
+  }
+
+  const handleMenuCloseProject = () => {
+    setMenuAnchorElProject(null)
+    setSelectedItemIdProject(null)
   }
 
   useEffect(() => {
@@ -198,7 +210,7 @@ const Dashboard = () => {
                           size="small"
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleMenuOpen(e, company.id)
+                            handleMenuOpenCompany(e, company.id)
                           }}
                         >
                           <MoreVertIcon />
@@ -270,7 +282,7 @@ const Dashboard = () => {
                           size="small"
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleMenuOpen(e, project.id)
+                            handleMenuOpenProject(e, project.id)
                           }}
                         >
                           <MoreVertIcon />
@@ -307,13 +319,25 @@ const Dashboard = () => {
         onCreateProject={handleCreateProject}
       />
 
-      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleMenuClose}>
+      <Menu anchorEl={menuAnchorElCompany} open={Boolean(menuAnchorElCompany)} onClose={handleMenuCloseCompany}>
         <MenuItem
           onClick={() => {
-            if (selectedItemId) {
-              handleViewCompany(selectedItemId)
+            if (selectedItemIdCompany) {
+              handleViewCompany(selectedItemIdCompany)
             }
-            handleMenuClose()
+            handleMenuCloseCompany()
+          }}
+        >
+          Открыть
+        </MenuItem>
+      </Menu>
+      <Menu anchorEl={menuAnchorElProject} open={Boolean(menuAnchorElProject)} onClose={handleMenuCloseProject}>
+        <MenuItem
+          onClick={() => {
+            if (selectedItemIdProject) {
+              handleViewProject(selectedItemIdProject)
+            }
+            handleMenuCloseProject()
           }}
         >
           Открыть

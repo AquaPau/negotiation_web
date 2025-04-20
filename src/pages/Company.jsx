@@ -321,28 +321,16 @@ const Company = () => {
                       <Typography variant="body1">{companyData.ogrn}</Typography>
                     </Grid>
                   )}
-                  {companyData.residence && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Страна регистрации
-                      </Typography>
-                      <Typography variant="body1">{defineCompanyResidence(companyData.residence)}</Typography>
-                    </Grid>
-                  )}
-                  {companyData.managerTitle && (
-                    <Grid item xs={12} sm={6}>
+                  {(companyData.managerTitle || companyData.managerName) && (
+                    <Grid item xs={12}>
                       <Typography variant="subtitle2" color="text.secondary">
                         Исполнительный орган
                       </Typography>
-                      <Typography variant="body1">{companyData.managerTitle}</Typography>
-                    </Grid>
-                  )}
-                  {companyData.managerName && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        ФИО исполнительного органа
+                      <Typography variant="body1">
+                        {companyData.managerTitle && companyData.managerName
+                          ? `${companyData.managerTitle}: ${companyData.managerName}`
+                          : companyData.managerTitle || companyData.managerName}
                       </Typography>
-                      <Typography variant="body1">{companyData.managerName}</Typography>
                     </Grid>
                   )}
                 </Grid>
@@ -352,7 +340,7 @@ const Company = () => {
 
           {/* Documents */}
           <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%" }}>
+            <Card sx={{ height: "100%"}}>
               <CardContent>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>

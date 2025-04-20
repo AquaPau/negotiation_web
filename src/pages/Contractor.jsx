@@ -192,14 +192,14 @@ const Contractor = () => {
         <Link color="inherit" href={`/company/${params.companyId}`} underline="hover">
           Компания
         </Link>
-        <Typography color="text.primary">{contractor?.customName || "Контрагент"}</Typography>
+        <Typography color="text.primary">{contractor?.customUserGeneratedName || "Контрагент"}</Typography>
       </Breadcrumbs>
 
       {/* Header with actions */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 4 }}>
         <Box sx={{ maxWidth: "70%" }}>
           <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-            {contractor?.customName || "Контрагент не найден"}
+            {contractor?.customUserGeneratedName || "Контрагент не найден"}
           </Typography>
           {contractor?.residence && (
             <Chip
@@ -268,25 +268,15 @@ const Contractor = () => {
                       {contractor.ogrn && contractor.ogrn !== "null" ? contractor.ogrn : "Не указан"}
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Страна регистрации
-                    </Typography>
-                    <Typography variant="body1">
-                      {contractor.residence ? defineCompanyResidence(contractor.residence) : "Не указана"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12}>
                     <Typography variant="subtitle2" color="text.secondary">
                       Исполнительный орган
                     </Typography>
-                    <Typography variant="body1">{contractor.managerTitle || "Не указан"}</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      ФИО исполнительного органа
+                    <Typography variant="body1">
+                      {contractor.managerTitle && contractor.managerName
+                        ? `${contractor.managerTitle}: ${contractor.managerName}`
+                        : contractor.managerTitle || contractor.managerName || "Не указан"}
                     </Typography>
-                    <Typography variant="body1">{contractor.managerName || "Не указано"}</Typography>
                   </Grid>
                 </Grid>
               </CardContent>
