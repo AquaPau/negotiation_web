@@ -52,7 +52,7 @@ const ProjectDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files).map((file) => ({
       file,
-      type: "CORPORATE",
+      type: "DEFAULT",
     }))
     setSelectedFiles((prev) => [...prev, ...newFiles])
   }
