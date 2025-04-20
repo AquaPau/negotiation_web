@@ -27,6 +27,7 @@ import DialogContentText from "@mui/material/DialogContentText"
 import DialogTitle from "@mui/material/DialogTitle"
 import CircularProgress from "@mui/material/CircularProgress"
 import Paper from "@mui/material/Paper"
+import MarkdownRenderer from "@/components/MarkdownRenderer"
 
 const ContractorDocument = () => {
   const params = useParams()
@@ -210,11 +211,8 @@ const ContractorDocument = () => {
                   </Box>
                 ) : doc.description && doc.description.text ? (
                   <Box>
-                    <Paper
-                      elevation={0}
-                      sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3, whiteSpace: "pre-wrap" }}
-                    >
-                      <Typography variant="body1">{doc.description.text}</Typography>
+                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
+                      <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
                     </Paper>
                     <Button
                       variant="outlined"
@@ -263,11 +261,8 @@ const ContractorDocument = () => {
                   </Box>
                 ) : doc.risks && doc.risks.text ? (
                   <Box>
-                    <Paper
-                      elevation={0}
-                      sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3, whiteSpace: "pre-wrap" }}
-                    >
-                      <Typography variant="body1">{doc.risks.text}</Typography>
+                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
+                      <MarkdownRenderer>{doc.risks.text}</MarkdownRenderer>
                     </Paper>
                     <Button
                       variant="outlined"

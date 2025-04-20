@@ -196,10 +196,10 @@ const Contractor = () => {
       </Breadcrumbs>
 
       {/* Header with actions */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-        <Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 4 }}>
+        <Box sx={{ maxWidth: "70%" }}>
           <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-            {contractor?.customName}
+            {contractor?.customName || "Контрагент не найден"}
           </Typography>
           {contractor?.residence && (
             <Chip
@@ -246,54 +246,48 @@ const Contractor = () => {
                 <Divider sx={{ mb: 3 }} />
 
                 <Grid container spacing={3}>
-                  {contractor.fullName && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Полное наименование
-                      </Typography>
-                      <Typography variant="body1">{contractor.fullName}</Typography>
-                    </Grid>
-                  )}
-                  {contractor.inn && contractor.inn !== "null" && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        ИНН
-                      </Typography>
-                      <Typography variant="body1">{contractor.inn}</Typography>
-                    </Grid>
-                  )}
-                  {contractor.ogrn && contractor.ogrn !== "null" && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        ОГРН
-                      </Typography>
-                      <Typography variant="body1">{contractor.ogrn}</Typography>
-                    </Grid>
-                  )}
-                  {contractor.residence && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Страна регистрации
-                      </Typography>
-                      <Typography variant="body1">{defineCompanyResidence(contractor.residence)}</Typography>
-                    </Grid>
-                  )}
-                  {contractor.managerTitle && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Исполнительный орган
-                      </Typography>
-                      <Typography variant="body1">{contractor.managerTitle}</Typography>
-                    </Grid>
-                  )}
-                  {contractor.managerName && (
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        ФИО исполнительного органа
-                      </Typography>
-                      <Typography variant="body1">{contractor.managerName}</Typography>
-                    </Grid>
-                  )}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Полное наименование
+                    </Typography>
+                    <Typography variant="body1">{contractor.fullName || "Не указано"}</Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      ИНН
+                    </Typography>
+                    <Typography variant="body1">
+                      {contractor.inn && contractor.inn !== "null" ? contractor.inn : "Не указан"}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      ОГРН
+                    </Typography>
+                    <Typography variant="body1">
+                      {contractor.ogrn && contractor.ogrn !== "null" ? contractor.ogrn : "Не указан"}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Страна регистрации
+                    </Typography>
+                    <Typography variant="body1">
+                      {contractor.residence ? defineCompanyResidence(contractor.residence) : "Не указана"}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Исполнительный орган
+                    </Typography>
+                    <Typography variant="body1">{contractor.managerTitle || "Не указан"}</Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      ФИО исполнительного органа
+                    </Typography>
+                    <Typography variant="body1">{contractor.managerName || "Не указано"}</Typography>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
