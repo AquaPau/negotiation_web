@@ -274,6 +274,7 @@ const Dashboard = () => {
                   У вас пока нет компаний
                 </Typography>
                 <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setIsCreateCompanyModalOpen(true)}>
+                Создать первую компанию
                 </Button>
               </CardContent>
             </Card>
