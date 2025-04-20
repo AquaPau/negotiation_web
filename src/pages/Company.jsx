@@ -1,28 +1,43 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
-
 import CreateContractorModal from "@/components/CreateContractorModal"
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import CompanyDocumentUploadDialog from "@/components/CompanyDocumentUploadDialog"
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import Container from "@mui/material/Container"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import Typography from "@mui/material/Typography"
+import Table from "@mui/material/Table"
+import TableBody from "@mui/material/TableBody"
+import TableCell from "@mui/material/TableCell"
+import TableHead from "@mui/material/TableHead"
+import TableRow from "@mui/material/TableRow"
+import Button from "@mui/material/Button"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import Divider from "@mui/material/Divider"
+import Chip from "@mui/material/Chip"
+import Snackbar from "@mui/material/Snackbar"
+import Alert from "@mui/material/Alert"
+import Skeleton from "@mui/material/Skeleton"
+import Breadcrumbs from "@mui/material/Breadcrumbs"
+import Link from "@mui/material/Link"
+import AddIcon from "@mui/icons-material/Add"
+import DeleteIcon from "@mui/icons-material/Delete"
+import UploadFileIcon from "@mui/icons-material/UploadFile"
+import BusinessIcon from "@mui/icons-material/Business"
+import DescriptionIcon from "@mui/icons-material/Description"
+import PeopleIcon from "@mui/icons-material/People"
+import NavigateNextIcon from "@mui/icons-material/NavigateNext"
+import Dialog from "@mui/material/Dialog"
+import DialogActions from "@mui/material/DialogActions"
+import DialogContent from "@mui/material/DialogContent"
+import DialogContentText from "@mui/material/DialogContentText"
+import DialogTitle from "@mui/material/DialogTitle"
 
 const Company = () => {
-
   const params = useParams()
   const [companyData, setCompanyData] = useState(null)
   const [contractorsList, setContractorsList] = useState([])
@@ -31,19 +46,21 @@ const Company = () => {
   const [isCompanyDocumentUploadDialogOpen, setIsCompanyDocumentUploadDialogOpen] = useState(false)
   const [isCreateContractorModalOpen, setIsCreateContractorModalOpen] = useState(false)
   const [uploadMessage, setUploadMessage] = useState("")
+  const [openSnack, setOpenSnack] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const navigate = useNavigate()
 
-  const [openSnack, setOpenSnack] = useState(false)
   const handleOpenSnack = () => {
-    setOpenSnack(true);
-  };
+    setOpenSnack(true)
+  }
+
   const handleCloseSnack = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
+    if (reason === "clickaway") {
+      return
     }
-    setOpenSnack(false);
-  };
-  const [errorMessage, setErrorMessage] = useState(null);
+    setOpenSnack(false)
+  }
 
   useEffect(() => {
     if (params.companyId) {
@@ -54,11 +71,6 @@ const Company = () => {
   useEffect(() => {
     if (companyData) {
       fetchCompanyDocuments()
-    }
-  }, [companyData])
-
-  useEffect(() => {
-    if (companyData) {
       fetchCompanyContractors()
     }
   }, [companyData])
@@ -66,12 +78,10 @@ const Company = () => {
   const fetchUserCompany = async () => {
     setIsLoading(true)
     try {
-      console.log(params)
       const response = await api.getCompany(params.companyId)
-      console.log(response.data)
       setCompanyData(response.data)
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
       console.error("Failed to fetch user company data:", error)
@@ -86,7 +96,7 @@ const Company = () => {
       const response = await api.getCompanyDocuments(companyData.id)
       setDocuments(response.data)
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
       console.error("Failed to fetch company documents:", error)
@@ -94,18 +104,15 @@ const Company = () => {
   }
 
   const fetchCompanyContractors = async () => {
-    setIsLoading(true)
     try {
       const response = await api.getContractors(companyData.id)
       setContractorsList(response.data)
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
       console.error("Failed to fetch company contractor list:", error)
       setContractorsList([])
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -113,55 +120,29 @@ const Company = () => {
     try {
       const userResponse = await api.userData()
       const user = userResponse.data
-      const response = await api.createContractor(params.companyId, {
+      await api.createContractor(params.companyId, {
         userId: user.id,
         customUserGeneratedName: contractorName,
         ogrn: ogrn,
-        region: country
+        region: country,
       })
       setIsCreateContractorModalOpen(false)
-      setTimeout(async () => {
-        fetchCompanyContractors()
-      }, 3000)
-      setTimeout(async () => {
-        fetchCompanyContractors()
-      }, 120000)
+      fetchCompanyContractors()
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
-      console.error("Failed to create company:", error)
+      console.error("Failed to create contractor:", error)
     }
   }
-
-    const analyseDocumentInsights = async (docId) => {
-      try {
-        api.getDocumentInsights(docId)
-        // Fetch updated file list after 3 seconds and 2 minutes
-        setTimeout(async () => {
-          fetchCompanyDocuments()
-        }, 3000)
-        setTimeout(async () => {
-          fetchCompanyDocuments()
-        }, 60000)
-
-      } catch (error) {
-        const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
-        setErrorMessage(message)
-        handleOpenSnack()
-        console.log("Failed to catch the document insights: " + docId)
-      }
-    }
 
   const handleViewContractorsDetails = (contractorId) => {
     if (companyData && companyData.id) {
       const url = `/company/${companyData.id}/contractor/${contractorId}`
       navigate(url)
     } else {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
-      setErrorMessage(message)
+      setErrorMessage("Данные о компании отсутствуют")
       handleOpenSnack()
-      console.error("Company data about contractor or ID is missing")
     }
   }
 
@@ -170,16 +151,22 @@ const Company = () => {
       const url = `/company/${companyData.id}/document/${documentId}`
       navigate(url)
     } else {
-      console.error("Company data about document or ID is missing")
+      setErrorMessage("Данные о компании отсутствуют")
+      handleOpenSnack()
     }
+  }
+
+  const handleDeleteCompanyConfirm = () => {
+    setDeleteConfirmOpen(true)
   }
 
   const handleDeleteCompany = async () => {
     try {
       await api.deleteCompany(companyData)
+      setDeleteConfirmOpen(false)
       navigate(`/`)
     } catch (error) {
-      const message = error?.response?.data ?? 'Неизвестная ошибка, повторите запрос'
+      const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
       handleOpenSnack()
       console.error("Failed to delete company:", error)
@@ -192,233 +179,354 @@ const Company = () => {
     fetchCompanyDocuments()
   }
 
+  const handleUploadError = (message) => {
+    setErrorMessage(message)
+    handleOpenSnack()
+  }
+
   const defineCompanyResidence = (code) => {
-    const answer = code == "RU" ?  "Российская Федерация"
-    : code == "KZ" ?  "Казахстан"
-    : code == "BY" ? "Республика Беларусь"
-    : "Другая"
-    return answer
+    return code === "RU"
+      ? "Российская Федерация"
+      : code === "KZ"
+        ? "Казахстан"
+        : code === "BY"
+          ? "Республика Беларусь"
+          : "Другая"
   }
 
   const defineDocTypeName = (name) => {
-    const answer = name == "LABOR_CONTRACT" ?  "Трудовой договор"
-        : name == "REAL_ESTATE_LEASE_CONTRACT" ?  "Договор аренды недвижимости"
-        : name == "SALES_CONTRACT" ? "Договор купли-продажи"
-        : name == "REAL_ESTATE_SALES_CONTRACT" ? "Договор купли-продажи недвижимости"
-        : name == "SERVICE_CONTRACT" ? "Договор услуг/работ"
-        : name == "LICENSE_CONTRACT" ? "Лицензионный договор"
-        : "Другое"
-        return answer
-  }
-
-  const handleUploadError = (message) => {
-    setUploadMessage(message)
+    const types = {
+      LABOR_CONTRACT: "Трудовой договор",
+      REAL_ESTATE_LEASE_CONTRACT: "Договор аренды недвижимости",
+      SALES_CONTRACT: "Договор купли-продажи",
+      REAL_ESTATE_SALES_CONTRACT: "Договор купли-продажи недвижимости",
+      SERVICE_CONTRACT: "Договор услуг/работ",
+      LICENSE_CONTRACT: "Лицензионный договор",
+    }
+    return types[name] || "Другое"
   }
 
   if (isLoading) {
-    return <div className="text-center mt-8">Загрузка...</div>
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+        <Box sx={{ mb: 4 }}>
+          <Skeleton variant="text" width={300} height={40} />
+          <Skeleton variant="text" width={200} height={24} sx={{ mt: 1 }} />
+        </Box>
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
+          </Grid>
+        </Grid>
+      </Container>
+    )
   }
 
   return (
-    <div className="m-5 space-y-6">
-      <Stack spacing={2} direction="row"  className="flex items-stretch justify-end">
-        <Button
-            variant="destructive"
-            size="small"
-            style={{ background: "#78909c" }}
-            className="button-primary mr-10 ml-2"
-            onClick={handleDeleteCompany}
-        >
-          Удалить компанию
-        </Button>
-        <Button
-            variant="contained"
-            size="small"
-            style={{ background: "#78909c" }}
-            className="button-primary"
-            onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
-        >
-          Загрузить документы
-        </Button>
-        <Button
-            variant="contained"
-            size="small"
-            style={{ background: "#78909c" }}
-            className="button-primary"
-            onClick={() => setIsCreateContractorModalOpen(true)}
-        >
-          Создать нового контрагента
-        </Button>
-      </Stack>
-      <div>
-        {companyData ? (
-          <>
-            <Paper className=" mb-10 w-lg">
-              <Card className="w-lg">
-                <CardHeader>
-                  <Typography variant="h6" gutterBottom>
-                    {companyData.customUserGeneratedName}
-                  </Typography>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-stretch justify-start">
-                    <Typography variant="subtitle2" gutterBottom className="inline">
-                      Страна регистрации: &nbsp;
-                    </Typography>
-                    <Typography variant="body2" gutterBottom className="inline">
-                      {companyData.residence}
-                    </Typography>
-                  </div>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+      {/* Breadcrumbs */}
+      <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ mb: 3 }}>
+        <Link color="inherit" href="/" underline="hover">
+          Главная
+        </Link>
+        <Typography color="text.primary">{companyData?.customUserGeneratedName || "Компания"}</Typography>
+      </Breadcrumbs>
 
-                  {companyData.fullName &&  <div className="flex items-stretch justify-start">
-                    <Typography variant="subtitle2" gutterBottom className="inline">
-                      Наименование: &nbsp;
-                    </Typography>
-                    <Typography variant="body2" gutterBottom className="inline">
-                      {companyData.fullName}
-                    </Typography>
-                  </div>}
-                  {companyData.inn && companyData.inn !== "null" &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          ИНН: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {companyData.inn}
-                        </Typography>
-                      </div>}
-                  {companyData.ogrn && companyData.ogrn !== "null" &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          ОГРН: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {companyData.ogrn}
-                        </Typography>
-                      </div>}
-                  {companyData.managerTitle &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          Исполнительный орган: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {companyData.managerTitle}
-                        </Typography>
-                      </div>}
-                  {companyData.managerName &&
-                      <div className="flex items-stretch justify-start">
-                        <Typography variant="subtitle2" gutterBottom className="inline">
-                          ФИО исполнительного органа: &nbsp;
-                        </Typography>
-                        <Typography variant="body2" gutterBottom className="inline">
-                          {companyData.managerName}
-                        </Typography>
-                      </div>}
-                </CardContent>
-              </Card>
-            </Paper>
-
-            <Container className="flex items-center justify-center w-full  mt-10">
-              <Box className="w-full" xl={{ maxWidth: 1200 }}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Документы</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>ID</TableCell>
-                          <TableCell>Наименование</TableCell>
-                          <TableCell>Детали</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {documents.map((doc) => (
-                            <TableRow key={doc.id}>
-                              <TableCell>{doc.id}</TableCell>
-                              <TableCell>{doc.name}</TableCell>
-                              <TableCell>{defineDocTypeName(doc.type)}</TableCell>
-                              <TableCell><Button variant="outlined" onClick={() => handleViewCompanyDocumentDetails(doc.id)}>Данные документа</Button></TableCell>
-                            </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </Box>
-            </Container>
-
-
-            <Container className="flex items-center justify-center w-full  mt-10">
-              <Box className="w-full" xl={{ maxWidth: 1200 }}>
-                <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle>Контрагенты</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {contractorsList.length > 0 ? (
-                        <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>ID</TableCell>
-                              <TableCell>Пользовательское название контрагента</TableCell>
-                              <TableCell>Детали</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {contractorsList.map((contr) => (
-                                <TableRow key={contr.id}>
-                                  <TableCell>{contr.id}</TableCell>
-                                  <TableCell>{contr.customName}</TableCell>
-                                  <TableCell><Button className="outline" onClick={() => handleViewContractorsDetails(contr.id)}>Данные контрагента</Button></TableCell>
-                                </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                    ) : (
-                        <Typography variant="h5">
-                          Контрагентов не найдено
-                        </Typography>
-                      )
-                    }
-                  </CardContent>
-                </Card>
-              </Box>
-            </Container>
-
-          </>) : (
-            <Typography variant="h4">
-              Компания не найдена!
-            </Typography>
+      {/* Header with actions */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
+        <Box>
+          <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+            {companyData?.customUserGeneratedName}
+          </Typography>
+          {companyData?.residence && (
+            <Chip
+              label={defineCompanyResidence(companyData.residence)}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
           )}
-        <CompanyDocumentUploadDialog
-          isOpen={isCompanyDocumentUploadDialogOpen}
-          onClose={() => setIsCompanyDocumentUploadDialogOpen(false)}
-          onUploadSuccess={() => {
-            handleUploadSuccess
-            fetchCompanyDocuments()
-          }
-          }
-          onUploadError={handleUploadError}
-          companyId={companyData?.id}
-        />
+        </Box>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={handleDeleteCompanyConfirm}
+            size="small"
+          >
+            Удалить компанию
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileIcon />}
+            onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
+            size="small"
+          >
+            Загрузить документы
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setIsCreateContractorModalOpen(true)}
+            size="small"
+          >
+            Добавить контрагента
+          </Button>
+        </Box>
+      </Box>
+
+      {companyData ? (
+        <Grid container spacing={4}>
+          {/* Company Details */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <BusinessIcon sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography variant="h6" component="h2" fontWeight={600}>
+                    Информация о компании
+                  </Typography>
+                </Box>
+                <Divider sx={{ mb: 3 }} />
+
+                <Grid container spacing={3}>
+                  {companyData.fullName && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Полное наименование
+                      </Typography>
+                      <Typography variant="body1">{companyData.fullName}</Typography>
+                    </Grid>
+                  )}
+                  {companyData.inn && companyData.inn !== "null" && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        ИНН
+                      </Typography>
+                      <Typography variant="body1">{companyData.inn}</Typography>
+                    </Grid>
+                  )}
+                  {companyData.ogrn && companyData.ogrn !== "null" && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        ОГРН
+                      </Typography>
+                      <Typography variant="body1">{companyData.ogrn}</Typography>
+                    </Grid>
+                  )}
+                  {companyData.residence && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Страна регистрации
+                      </Typography>
+                      <Typography variant="body1">{defineCompanyResidence(companyData.residence)}</Typography>
+                    </Grid>
+                  )}
+                  {companyData.managerTitle && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Исполнительный орган
+                      </Typography>
+                      <Typography variant="body1">{companyData.managerTitle}</Typography>
+                    </Grid>
+                  )}
+                  {companyData.managerName && (
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        ФИО исполнительного органа
+                      </Typography>
+                      <Typography variant="body1">{companyData.managerName}</Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Documents */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: "100%" }}>
+              <CardContent>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <DescriptionIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Документы
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
+                  >
+                    Добавить
+                  </Button>
+                </Box>
+                <Divider sx={{ mb: 3 }} />
+
+                {documents.length > 0 ? (
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Наименование</TableCell>
+                        <TableCell>Тип</TableCell>
+                        <TableCell align="right">Действия</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {documents.map((doc) => (
+                        <TableRow key={doc.id} hover>
+                          <TableCell>{doc.name}</TableCell>
+                          <TableCell>{defineDocTypeName(doc.type)}</TableCell>
+                          <TableCell align="right">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => handleViewCompanyDocumentDetails(doc.id)}
+                            >
+                              Просмотр
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <Typography color="text.secondary">Документы отсутствуют</Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={() => setIsCompanyDocumentUploadDialogOpen(true)}
+                      sx={{ mt: 2 }}
+                    >
+                      Загрузить документы
+                    </Button>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Contractors */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ height: "100%" }}>
+              <CardContent>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <PeopleIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Контрагенты
+                    </Typography>
+                  </Box>
+                  <Button size="small" startIcon={<AddIcon />} onClick={() => setIsCreateContractorModalOpen(true)}>
+                    Добавить
+                  </Button>
+                </Box>
+                <Divider sx={{ mb: 3 }} />
+
+                {contractorsList.length > 0 ? (
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Название</TableCell>
+                        <TableCell align="right">Действия</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {contractorsList.map((contractor) => (
+                        <TableRow key={contractor.id} hover>
+                          <TableCell>{contractor.customName}</TableCell>
+                          <TableCell align="right">
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => handleViewContractorsDetails(contractor.id)}
+                            >
+                              Просмотр
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <Typography color="text.secondary">Контрагенты отсутствуют</Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={() => setIsCreateContractorModalOpen(true)}
+                      sx={{ mt: 2 }}
+                    >
+                      Добавить контрагента
+                    </Button>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      ) : (
+        <Card>
+          <CardContent sx={{ textAlign: "center", py: 6 }}>
+            <Typography variant="h5" gutterBottom>
+              Компания не найдена
+            </Typography>
+            <Button variant="contained" component={Link} href="/" sx={{ mt: 2 }}>
+              Вернуться на главную
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Modals */}
+      <CompanyDocumentUploadDialog
+        isOpen={isCompanyDocumentUploadDialogOpen}
+        onClose={() => setIsCompanyDocumentUploadDialogOpen(false)}
+        onUploadSuccess={handleUploadSuccess}
+        onUploadError={handleUploadError}
+        companyId={companyData?.id}
+      />
+
       <CreateContractorModal
         isOpen={isCreateContractorModalOpen}
         onClose={() => setIsCreateContractorModalOpen(false)}
         onCreateContractor={handleCreateContractor}
       />
-      </div>
 
-      <Snackbar
-          open={openSnack}
-          autoHideDuration={6000}
-          onClose={handleCloseSnack}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <DialogTitle>Подтверждение удаления</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Вы уверены, что хотите удалить компанию "{companyData?.customUserGeneratedName}"? Это действие нельзя будет
+            отменить.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>Отмена</Button>
+          <Button onClick={handleDeleteCompany} color="error" autoFocus>
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar open={openSnack} autoHideDuration={6000} onClose={handleCloseSnack}>
+        <Alert onClose={handleCloseSnack} severity="error" sx={{ width: "100%" }}>
+          {errorMessage}
+        </Alert>
       </Snackbar>
-    </div>
-  );
-};
+    </Container>
+  )
+}
 
 export default Company
