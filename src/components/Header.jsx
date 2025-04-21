@@ -21,7 +21,6 @@ import Avatar from "@mui/material/Avatar"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import GavelIcon from "@mui/icons-material/Gavel"
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { useTheme } from "@mui/material/styles"
 
@@ -55,7 +54,6 @@ const Header = () => {
     { text: "Компании", path: "/" },
     { text: "Проекты", path: "/" },
     { text: "Диалоги", path: "/" },
-    { text: "FAQ", path: "/faq" },
   ]
 
   const drawer = (
@@ -86,11 +84,6 @@ const Header = () => {
             <ListItem disablePadding>
               <ListItemButton component={Link} to="/register">
                 <ListItemText primary="Регистрация" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component={Link} to="/faq">
-                <ListItemText primary="FAQ" />
               </ListItemButton>
             </ListItem>
           </>
@@ -136,20 +129,11 @@ const Header = () => {
             {!isMobile && (
               <Box sx={{ display: "flex", gap: 2 }}>
                 {user &&
-                  menuItems.slice(0, 3).map((item) => (
+                  menuItems.map((item) => (
                     <Button key={item.text} component={Link} to={item.path} color="inherit" sx={{ fontWeight: 500 }}>
                       {item.text}
                     </Button>
                   ))}
-                <Button
-                  component={Link}
-                  to="/faq"
-                  color="inherit"
-                  sx={{ fontWeight: 500 }}
-                  startIcon={<HelpOutlineIcon />}
-                >
-                  FAQ
-                </Button>
               </Box>
             )}
 
