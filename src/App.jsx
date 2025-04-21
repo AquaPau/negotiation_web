@@ -15,6 +15,7 @@ import Project from "@/pages/Project"
 import Company from "@/pages/Company"
 import CompanyDocument from "@/pages/CompanyDocument"
 import ContractorDocument from "@/pages/ContractorDocument"
+import FAQ from "@/pages/FAQ"
 import { AxiosInterceptor } from "./components/AxiosInterceptor"
 import "@/App.css"
 
@@ -29,18 +30,10 @@ function App() {
               <Header />
               <main className="py-4 px-4 md:px-6 max-w-7xl mx-auto">
                 <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/company/:companyId" element={<Company />} />
-                  <Route path="/company/:companyId/contractor/:contractorId" element={<Contractor />} />
-                  <Route path="/company/:companyId/document/:documentId" element={<CompanyDocument />} />
-                  <Route
-                    path="/company/:companyId/contractor/:contractorId/document/:documentId"
-                    element={<ContractorDocument />}
-                  />
-                  <Route path="/project/:projectId" element={<Project />} />
+                  <Route path="/faq" element={<FAQ />} />
+
                   <Route
                     path="/"
                     element={
@@ -49,6 +42,55 @@ function App() {
                       </PrivateRoute>
                     }
                   />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <PrivateRoute>
+                        <Dashboard />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/company/:companyId"
+                    element={
+                      <PrivateRoute>
+                        <Company />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/company/:companyId/contractor/:contractorId"
+                    element={
+                      <PrivateRoute>
+                        <Contractor />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/company/:companyId/document/:documentId"
+                    element={
+                      <PrivateRoute>
+                        <CompanyDocument />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/company/:companyId/contractor/:contractorId/document/:documentId"
+                    element={
+                      <PrivateRoute>
+                        <ContractorDocument />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/project/:projectId"
+                    element={
+                      <PrivateRoute>
+                        <Project />
+                      </PrivateRoute>
+                    }
+                  />
+
                   <Route
                     path="*"
                     element={

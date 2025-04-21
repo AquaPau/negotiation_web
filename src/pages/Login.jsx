@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, Link, useLocation } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { api } from "../api/api"
 import TextField from "@mui/material/TextField"
@@ -25,6 +25,7 @@ const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
+  const location = useLocation()
   const { login } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
@@ -55,7 +56,10 @@ const Login = () => {
     try {
       const response = await api.login({ email, password })
       login(response.data)
-      navigate("/")
+
+      // Перенаправляем пользователя на страницу, с которой он пришел, или на главную
+      const from = location.state?.from?.pathname || "/"
+      navigate(from)
     } catch (error) {
       const message = error?.response?.data ?? "Неверный email или пароль"
       setErrorMessage(message)
