@@ -20,7 +20,6 @@ import Container from "@mui/material/Container"
 import Avatar from "@mui/material/Avatar"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
-import GavelIcon from "@mui/icons-material/Gavel"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { useTheme } from "@mui/material/styles"
 
@@ -59,7 +58,11 @@ const Header = () => {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ width: 250 }}>
       <Box sx={{ p: 2, display: "flex", alignItems: "center" }}>
-        <GavelIcon sx={{ mr: 1 }} />
+        <img
+          src="/logo.png"
+          alt="Legentum Logo"
+          style={{ width: 24, height: 24, marginRight: 8, borderRadius: "50%" }}
+        />
         <Typography variant="h6" component="div">
           Legentum
         </Typography>
@@ -110,7 +113,11 @@ const Header = () => {
             )}
 
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <GavelIcon sx={{ mr: 1, color: "primary.main" }} />
+              <img
+                src="/logo.png"
+                alt="Legentum Logo"
+                style={{ width: 28, height: 28, marginRight: 8, borderRadius: "50%" }}
+              />
               <Typography
                 variant="h6"
                 component={Link}

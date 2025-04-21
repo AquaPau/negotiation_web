@@ -6,7 +6,6 @@ import Container from "@mui/material/Container"
 import Typography from "@mui/material/Typography"
 import Grid from "@mui/material/Grid"
 import Divider from "@mui/material/Divider"
-import GavelIcon from "@mui/icons-material/Gavel"
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline"
 import EmailIcon from "@mui/icons-material/Email"
 import PhoneIcon from "@mui/icons-material/Phone"
@@ -33,12 +32,7 @@ const Footer = () => {
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           <Grid item xs={12} sm={4}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <GavelIcon sx={{ mr: 1, color: "primary.main" }} />
-              <Typography variant="h6" component="div" fontWeight={600}>
-                Legentum
-              </Typography>
-            </Box>
+            <Box sx={{ mb: 2 }}></Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Система для управления юридическими документами и анализа рисков
             </Typography>
@@ -60,7 +54,7 @@ const Footer = () => {
                   }}
                 >
                   <HelpOutlineIcon sx={{ mr: 1, fontSize: 18 }} />
-                  <Typography variant="body2">F.A.Q.</Typography>
+                  <Typography variant="body2">Часто задаваемые вопросы</Typography>
                 </Link>
               </Box>
             </Box>
@@ -112,3 +106,4 @@ const Footer = () => {
 }
 
 export default Footer
+
