@@ -6,6 +6,7 @@ import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { theme } from "./theme/theme"
 import Header from "./components/Header"
+import Footer from "./components/Footer"
 import PrivateRoute from "./components/PrivateRoute"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
@@ -26,9 +27,9 @@ function App() {
       <Router>
         <AuthProvider>
           <AxiosInterceptor>
-            <div className="min-h-screen bg-gray-50">
+            <div className="flex flex-col min-h-screen bg-gray-50">
               <Header />
-              <main className="py-4 px-4 md:px-6 max-w-7xl mx-auto">
+              <main className="py-4 px-4 md:px-6 max-w-7xl mx-auto flex-grow">
                 <Routes>
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
@@ -105,6 +106,7 @@ function App() {
                   />
                 </Routes>
               </main>
+              <Footer />
             </div>
           </AxiosInterceptor>
         </AuthProvider>
