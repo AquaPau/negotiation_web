@@ -19,7 +19,6 @@ import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
 import Container from "@mui/material/Container"
-import GavelIcon from "@mui/icons-material/Gavel"
 
 const Login = () => {
   const [email, setEmail] = useState("")
@@ -86,7 +85,11 @@ const Login = () => {
       >
         <Box sx={{ mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <GavelIcon sx={{ fontSize: 32, mr: 1, color: "primary.main" }} />
+            <img
+              src="/logo.png"
+              alt="Legentum Logo"
+              style={{ width: 32, height: 32, marginRight: 8, borderRadius: "50%" }}
+            />
             <Typography component="h1" variant="h4" fontWeight={700}>
               Legentum
             </Typography>
