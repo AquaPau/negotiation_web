@@ -11,11 +11,15 @@ const axiosInstance = axios.create({
   withCredentials: true,
 })
 
+// Удаляем логику работы с токенами из перехватчика запросов
 export const setupAxiosInterceptors = (handleUnauthorized) => {
+  // Обновляем перехватчик ответов для обработки ошибок аутентификации
   axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 403) {
+      // Проверяем, является ли ошибка связанной с аутентификацией
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        // Вызываем обработчик неавторизованного доступа
         handleUnauthorized()
       }
       return Promise.reject(error)
@@ -120,14 +124,25 @@ export const api = {
     axiosInstance.delete(`/project/${projectId}/document/${documentId}`),
   deleteProjectDocuments: (projectId) => axiosInstance.delete(`/project/${projectId}/document`),
 
-  // Dialogs TBD
+  // Dialogs
   getUserDialogs: () => axiosInstance.get(`/dialog`),
   createDialog: (dialogData) => axiosInstance.post(`/dialog`, dialogData),
   getDialog: (dialogId) => axiosInstance.get(`/dialog/${dialogId}`),
   deleteDialog: (dialogId) => axiosInstance.delete(`/dialog/${dialogId}`),
 
   // FAQ
-  getFAQ: () => axiosInstance.get(`/faq`),
+  getFAQ: () => {
+    // Создаем отдельный экземпляр axios без авторизации
+    const publicAxios = axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+
+    return publicAxios.get(`/api/faq`)
+  },
 
   //Task status
   getTaskStatus: (id) => axiosInstance.get(`/task/${id}`),
@@ -137,5 +152,3 @@ export const api = {
   getDocumentRisks: (id, retry) => axiosInstance.get(`/analyse/document/${id}/risks?retry=${retry}`),
   getProjectResolution: (id, retry) => axiosInstance.get(`/analyse/project/${id}/resolution?retry=${retry}`),
 }
-
-

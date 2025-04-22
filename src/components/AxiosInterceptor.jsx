@@ -6,15 +6,23 @@ import { useAuth } from "../context/AuthContext"
 import { useLocation } from "react-router-dom"
 
 export const AxiosInterceptor = ({ children }) => {
-  const { _, loading, login, logout, handleUnauthorized } = useAuth()
+  const { user, loading, login, logout, handleUnauthorized } = useAuth()
   const location = useLocation()
 
   useEffect(() => {
+    // Создаем обработчик, который проверяет текущий путь
     const customUnauthorizedHandler = () => {
-      if (location.pathname === "/faq") {
+      // Если пользователь на странице FAQ или других публичных страницах, не выполняем перенаправление
+      if (location.pathname === "/faq" || location.pathname === "/login" || location.pathname === "/register") {
         return
       }
-      handleUnauthorized()
+
+      // Проверяем, есть ли пользователь в localStorage
+      const storedUser = localStorage.getItem("user")
+      if (!storedUser) {
+        // Если пользователя нет, выполняем стандартную обработку неавторизованного доступа
+        handleUnauthorized()
+      }
     }
 
     setupAxiosInterceptors(customUnauthorizedHandler)
