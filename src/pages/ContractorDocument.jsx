@@ -1,5 +1,6 @@
 "use client"
 
+// Обновляем импорты, добавляя необходимые компоненты
 import { useState, useEffect } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
@@ -20,6 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import WarningIcon from "@mui/icons-material/Warning"
 import InfoIcon from "@mui/icons-material/Info"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
+import RefreshIcon from "@mui/icons-material/Refresh"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -28,13 +30,12 @@ import DialogTitle from "@mui/material/DialogTitle"
 import CircularProgress from "@mui/material/CircularProgress"
 import Paper from "@mui/material/Paper"
 import MarkdownRenderer from "@/components/MarkdownRenderer"
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 
 const ContractorDocument = () => {
   const params = useParams()
   const [doc, setDoc] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [isRiskAnalyzing, setIsRiskAnalyzing] = useState(false)
   const [openSnack, setOpenSnack] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
@@ -73,43 +74,31 @@ const ContractorDocument = () => {
   }
 
   const analyseDocumentDescription = async (docId, isRetry) => {
-    setIsAnalyzing(true)
     try {
       await api.getDocumentDescription(docId, isRetry)
-      // Fetch updated document after 3 seconds and 1 minute
+      // После запуска анализа обновляем данные документа
       setTimeout(() => {
         fetchContractorDocument()
-      }, 3000)
-      setTimeout(() => {
-        fetchContractorDocument()
-        setIsAnalyzing(false)
-      }, 60000)
+      }, 2000)
     } catch (error) {
       const message = error?.response?.data ?? "Ошибка анализа документа"
       setErrorMessage(message)
       handleOpenSnack()
-      setIsAnalyzing(false)
       console.error("Failed to analyze document description:", error)
     }
   }
 
   const analyseDocumentRisks = async (docId, isRetry) => {
-    setIsRiskAnalyzing(true)
     try {
       await api.getDocumentRisks(docId, isRetry)
-      // Fetch updated document after 3 seconds and 1 minute
+      // После запуска анализа обновляем данные документа
       setTimeout(() => {
         fetchContractorDocument()
-      }, 3000)
-      setTimeout(() => {
-        fetchContractorDocument()
-        setIsRiskAnalyzing(false)
-      }, 60000)
+      }, 2000)
     } catch (error) {
       const message = error?.response?.data ?? "Ошибка анализа рисков"
       setErrorMessage(message)
       handleOpenSnack()
-      setIsRiskAnalyzing(false)
       console.error("Failed to analyze document risks:", error)
     }
   }
@@ -129,6 +118,46 @@ const ContractorDocument = () => {
       handleOpenSnack()
       console.error("Failed to delete document:", error)
     }
+  }
+
+  // Проверка статуса задачи анализа содержимого
+  const getDescriptionStatus = () => {
+    if (!doc || !doc.description || !doc.description.status) {
+      return null
+    }
+    return doc.description.status
+  }
+
+  // Проверка статуса задачи анализа рисков
+  const getRisksStatus = () => {
+    if (!doc || !doc.risks || !doc.risks.status) {
+      return null
+    }
+    return doc.risks.status
+  }
+
+  // Определение, нужно ли показывать лоадер для анализа содержимого
+  const isDescriptionLoading = () => {
+    const status = getDescriptionStatus()
+    return status && status !== "FINISHED" && status !== "FAILED"
+  }
+
+  // Определение, нужно ли показывать лоадер для анализа рисков
+  const isRisksLoading = () => {
+    const status = getRisksStatus()
+    return status && status !== "FINISHED" && status !== "FAILED"
+  }
+
+  // Определение, доступна ли кнопка обновления анализа содержимого
+  const isDescriptionUpdateAvailable = () => {
+    const status = getDescriptionStatus()
+    return !status || status === "FINISHED" || status === "FAILED"
+  }
+
+  // Определение, доступна ли кнопка обновления анализа рисков
+  const isRisksUpdateAvailable = () => {
+    const status = getRisksStatus()
+    return !status || status === "FINISHED" || status === "FAILED"
   }
 
   if (isLoading) {
@@ -196,29 +225,50 @@ const ContractorDocument = () => {
           <Grid item xs={12} md={6}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <InfoIcon sx={{ mr: 1, color: "primary.main" }} />
-                  <Typography variant="h6" component="h2" fontWeight={600}>
-                    Содержимое документа
-                  </Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <InfoIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Содержимое документа
+                    </Typography>
+                  </Box>
                 </Box>
                 <Divider sx={{ mb: 3 }} />
 
-                {isAnalyzing ? (
+                {isDescriptionLoading() ? (
                   <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
                     <CircularProgress size={40} sx={{ mb: 2 }} />
                     <Typography>Анализ документа...</Typography>
                   </Box>
-                ) : doc.description && doc.description.text ? (
+                ) : getDescriptionStatus() === "FINISHED" && doc.description && doc.description.text ? (
                   <Box>
-                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
-                      <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
-                    </Paper>
+                  <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                    <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
+                  </Paper>
+                  {doc.description && isDescriptionUpdateAvailable() && (
                     <Button
                       variant="outlined"
-                      onClick={() => analyseDocumentDescription(doc.id, true)}
+                      startIcon={<RefreshIcon />}
                       sx={{ mt: 2 }}
-                      disabled={isAnalyzing}
+                      onClick={() => analyseDocumentDescription(doc.id, true)}
+                      disabled={isDescriptionLoading()}
+                    >
+                      Обновить анализ
+                    </Button>
+                  )}
+                  </Box>
+                ) : getDescriptionStatus() === "FAILED" ? (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <ErrorOutlineIcon sx={{ fontSize: 40, color: "error.main", mb: 2 }} />
+                    <Typography color="error" gutterBottom>
+                      Произошла ошибка анализа содержимого документа, пожалуйста, попробуйте еще раз
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<RefreshIcon />}
+                      sx={{ mt: 2 }}
+                      onClick={() => analyseDocumentDescription(doc.id, true)}
+                      disabled={isDescriptionLoading()}
                     >
                       Обновить анализ
                     </Button>
@@ -232,7 +282,6 @@ const ContractorDocument = () => {
                       variant="contained"
                       onClick={() => analyseDocumentDescription(doc.id, false)}
                       sx={{ mt: 2 }}
-                      disabled={isAnalyzing}
                     >
                       Выполнить анализ
                     </Button>
@@ -246,31 +295,52 @@ const ContractorDocument = () => {
           <Grid item xs={12} md={6}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <WarningIcon sx={{ mr: 1, color: "warning.main" }} />
-                  <Typography variant="h6" component="h2" fontWeight={600}>
-                    Риски документа
-                  </Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <WarningIcon sx={{ mr: 1, color: "warning.main" }} />
+                    <Typography variant="h6" component="h2" fontWeight={600}>
+                      Риски документа
+                    </Typography>
+                  </Box>
                 </Box>
                 <Divider sx={{ mb: 3 }} />
 
-                {isRiskAnalyzing ? (
+                {isRisksLoading() ? (
                   <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
                     <CircularProgress size={40} sx={{ mb: 2 }} />
                     <Typography>Анализ рисков...</Typography>
                   </Box>
-                ) : doc.risks && doc.risks.text ? (
+                ) : getRisksStatus() === "FINISHED" && doc.risks && doc.risks.text ? (
                   <Box>
-                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2, mb: 3 }}>
-                      <MarkdownRenderer>{doc.risks.text}</MarkdownRenderer>
-                    </Paper>
+                  <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                    <MarkdownRenderer>{doc.risks.text}</MarkdownRenderer>
+                  </Paper>
+                  {doc.risks && isRisksUpdateAvailable() && (
                     <Button
                       variant="outlined"
-                      onClick={() => analyseDocumentRisks(doc.id, true)}
+                      startIcon={<RefreshIcon />}
                       sx={{ mt: 2 }}
-                      disabled={isRiskAnalyzing}
+                      onClick={() => analyseDocumentRisks(doc.id, true)}
+                      disabled={isRisksLoading()}
                     >
-                      Обновить анализ рисков
+                      Обновить анализ
+                    </Button>
+                  )}
+                  </Box>
+                ) : getRisksStatus() === "FAILED" ? (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <ErrorOutlineIcon sx={{ fontSize: 40, color: "error.main", mb: 2 }} />
+                    <Typography color="error" gutterBottom>
+                      Произошла ошибка анализа рисков документа, пожалуйста, попробуйте еще раз
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<RefreshIcon />}
+                      sx={{ mt: 2 }}
+                      onClick={() => analyseDocumentRisks(doc.id, true)}
+                      disabled={isRisksLoading()}
+                    >
+                      Обновить анализ
                     </Button>
                   </Box>
                 ) : (
@@ -278,12 +348,7 @@ const ContractorDocument = () => {
                     <Typography color="text.secondary" gutterBottom>
                       Анализ рисков документа не выполнен
                     </Typography>
-                    <Button
-                      variant="contained"
-                      onClick={() => analyseDocumentRisks(doc.id, false)}
-                      sx={{ mt: 2 }}
-                      disabled={isRiskAnalyzing}
-                    >
+                    <Button variant="contained" onClick={() => analyseDocumentRisks(doc.id, false)} sx={{ mt: 2 }}>
                       Выполнить анализ рисков
                     </Button>
                   </Box>
@@ -337,3 +402,4 @@ const ContractorDocument = () => {
 }
 
 export default ContractorDocument
+
