@@ -1,7 +1,7 @@
 "use client"
 
 // Обновляем импорты, добавляя необходимые компоненты
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { api } from "@/api/api"
 import { useParams, useNavigate } from "react-router-dom"
 import Container from "@mui/material/Container"
@@ -41,6 +41,20 @@ const ContractorDocument = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const navigate = useNavigate()
 
+  // Заменим использование useState для хранения интервалов на useRef
+  // Это позволит избежать проблем с замыканиями и обеспечит сохранение актуальных ссылок на интервалы
+
+  // Заменим эти строки:
+  // const [descriptionPollingInterval, setDescriptionPollingInterval] = useState(null)
+  // const [risksPollingInterval, setRisksPollingInterval] = useState(null)
+
+  // На:
+  const descriptionPollingIntervalRef = useRef(null)
+  const risksPollingIntervalRef = useRef(null)
+
+  // Добавляем useRef для предотвращения утечек памяти при размонтировании
+  const isMounted = useRef(true)
+
   const handleOpenSnack = () => {
     setOpenSnack(true)
   }
@@ -52,17 +66,50 @@ const ContractorDocument = () => {
     setOpenSnack(false)
   }
 
+  // Исправляем зависимости в useEffect, чтобы избежать повторного создания интервалов
   useEffect(() => {
     if (params.companyId && params.contractorId && params.documentId) {
       fetchContractorDocument()
     }
-  }, [params.companyId, params.contractorId, params.documentId])
 
+    // Добавляем эффект для очистки при размонтировании
+    return () => {
+      isMounted.current = false
+      // Очищаем интервалы при размонтировании компонента
+      if (descriptionPollingIntervalRef.current) clearInterval(descriptionPollingIntervalRef.current)
+      if (risksPollingIntervalRef.current) clearInterval(risksPollingIntervalRef.current)
+    }
+  }, [params.companyId, params.contractorId, params.documentId]) // Убираем лишние зависимости
+
+  // Обновим функцию fetchContractorDocument для более надежного запуска опроса при загрузке
   const fetchContractorDocument = async () => {
     setIsLoading(true)
     try {
       const response = await api.getContractorDocument(params.companyId, params.contractorId, params.documentId)
       setDoc(response.data)
+      console.log("Fetched document:", response.data)
+
+      // Проверяем статус анализа содержания при загрузке страницы
+      if (
+        response.data?.description?.status &&
+        response.data.description.status !== "FINISHED" &&
+        response.data.description.status !== "FAILED"
+      ) {
+        console.log("Document description analysis in progress, starting polling")
+        // Если анализ содержания в процессе, запускаем опрос
+        startDescriptionPolling()
+      }
+
+      // Проверяем статус анализа рисков при загрузке страницы
+      if (
+        response.data?.risks?.status &&
+        response.data.risks.status !== "FINISHED" &&
+        response.data.risks.status !== "FAILED"
+      ) {
+        console.log("Document risks analysis in progress, starting polling")
+        // Если анализ рисков в процессе, запускаем опрос
+        startRisksPolling()
+      }
     } catch (error) {
       const message = error?.response?.data ?? "Неизвестная ошибка, повторите запрос"
       setErrorMessage(message)
@@ -73,13 +120,117 @@ const ContractorDocument = () => {
     }
   }
 
+  // Заменим весь код функции startDescriptionPolling на следующий:
+  const startDescriptionPolling = () => {
+    console.log("Starting description polling...")
+
+    // Очищаем предыдущий интервал, если он существует
+    if (descriptionPollingIntervalRef.current) {
+      console.log("Clearing previous description polling interval")
+      clearInterval(descriptionPollingIntervalRef.current)
+      descriptionPollingIntervalRef.current = null
+    }
+
+    // Создаем новый интервал с более простой логикой
+    const intervalId = setInterval(() => {
+      console.log("Description polling interval triggered")
+
+      // Выполняем запрос к API
+      api
+        .getContractorDocument(params.companyId, params.contractorId, params.documentId)
+        .then((response) => {
+          console.log("Description polling received response:", response.data?.description?.status)
+
+          // Обновляем данные документа
+          setDoc(response.data)
+
+          // Проверяем статус анализа
+          if (response.data?.description?.status === "FINISHED" || response.data?.description?.status === "FAILED") {
+            console.log("Description analysis completed, stopping polling")
+            clearInterval(intervalId)
+            descriptionPollingIntervalRef.current = null
+          }
+        })
+        .catch((error) => {
+          console.error("Error in description polling:", error)
+        })
+    }, 5000) // Опрашиваем каждые 5 секунд
+
+    // Сохраняем идентификатор интервала
+    descriptionPollingIntervalRef.current = intervalId
+
+    // Выполняем первый запрос немедленно
+    api
+      .getContractorDocument(params.companyId, params.contractorId, params.documentId)
+      .then((response) => {
+        console.log("Initial description polling response:", response.data?.description?.status)
+        setDoc(response.data)
+      })
+      .catch((error) => {
+        console.error("Error in initial description polling:", error)
+      })
+  }
+
+  // Заменим весь код функции startRisksPolling на следующий:
+  const startRisksPolling = () => {
+    console.log("Starting risks polling...")
+
+    // Очищаем предыдущий интервал, если он существует
+    if (risksPollingIntervalRef.current) {
+      console.log("Clearing previous risks polling interval")
+      clearInterval(risksPollingIntervalRef.current)
+      risksPollingIntervalRef.current = null
+    }
+
+    // Создаем новый интервал с более простой логикой
+    const intervalId = setInterval(() => {
+      console.log("Risks polling interval triggered")
+
+      // Выполняем запрос к API
+      api
+        .getContractorDocument(params.companyId, params.contractorId, params.documentId)
+        .then((response) => {
+          console.log("Risks polling received response:", response.data?.risks?.status)
+
+          // Обновляем данные документа
+          setDoc(response.data)
+
+          // Проверяем статус анализа
+          if (response.data?.risks?.status === "FINISHED" || response.data?.risks?.status === "FAILED") {
+            console.log("Risks analysis completed, stopping polling")
+            clearInterval(intervalId)
+            risksPollingIntervalRef.current = null
+          }
+        })
+        .catch((error) => {
+          console.error("Error in risks polling:", error)
+        })
+    }, 5000) // Опрашиваем каждые 5 секунд
+
+    // Сохраняем идентификатор интервала
+    risksPollingIntervalRef.current = intervalId
+
+    // Выполняем первый запрос немедленно
+    api
+      .getContractorDocument(params.companyId, params.contractorId, params.documentId)
+      .then((response) => {
+        console.log("Initial risks polling response:", response.data?.risks?.status)
+        setDoc(response.data)
+      })
+      .catch((error) => {
+        console.error("Error in initial risks polling:", error)
+      })
+  }
+
+  // Обновим функцию analyseDocumentDescription для более надежного запуска опроса
   const analyseDocumentDescription = async (docId, isRetry) => {
     try {
-      await api.getDocumentDescription(docId, isRetry)
-      // После запуска анализа обновляем данные документа
-      setTimeout(() => {
-        fetchContractorDocument()
-      }, 2000)
+      console.log("Starting document description analysis, isRetry:", isRetry)
+      const response = await api.getDocumentDescription(docId, isRetry)
+      console.log("Analysis request response:", response)
+
+      // Запускаем опрос статуса анализа содержания
+      startDescriptionPolling()
     } catch (error) {
       const message = error?.response?.data ?? "Ошибка анализа документа"
       setErrorMessage(message)
@@ -88,13 +239,15 @@ const ContractorDocument = () => {
     }
   }
 
+  // Обновим функцию analyseDocumentRisks для более надежного запуска опроса
   const analyseDocumentRisks = async (docId, isRetry) => {
     try {
-      await api.getDocumentRisks(docId, isRetry)
-      // После запуска анализа обновляем данные документа
-      setTimeout(() => {
-        fetchContractorDocument()
-      }, 2000)
+      console.log("Starting document risks analysis, isRetry:", isRetry)
+      const response = await api.getDocumentRisks(docId, isRetry)
+      console.log("Risks analysis request response:", response)
+
+      // Запускаем опрос статуса анализа рисков
+      startRisksPolling()
     } catch (error) {
       const message = error?.response?.data ?? "Ошибка анализа рисков"
       setErrorMessage(message)
@@ -136,16 +289,15 @@ const ContractorDocument = () => {
     return doc.risks.status
   }
 
-  // Определение, нужно ли показывать лоадер для анализа содержимого
+  // Обновим функции для определения состояния загрузки:
   const isDescriptionLoading = () => {
     const status = getDescriptionStatus()
-    return status && status !== "FINISHED" && status !== "FAILED"
+    return (status && status !== "FINISHED" && status !== "FAILED") || descriptionPollingIntervalRef.current !== null
   }
 
-  // Определение, нужно ли показывать лоадер для анализа рисков
   const isRisksLoading = () => {
     const status = getRisksStatus()
-    return status && status !== "FINISHED" && status !== "FAILED"
+    return (status && status !== "FINISHED" && status !== "FAILED") || risksPollingIntervalRef.current !== null
   }
 
   // Определение, доступна ли кнопка обновления анализа содержимого
@@ -242,20 +394,20 @@ const ContractorDocument = () => {
                   </Box>
                 ) : getDescriptionStatus() === "FINISHED" && doc.description && doc.description.text ? (
                   <Box>
-                  <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
-                    <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
-                  </Paper>
-                  {doc.description && isDescriptionUpdateAvailable() && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<RefreshIcon />}
-                      sx={{ mt: 2 }}
-                      onClick={() => analyseDocumentDescription(doc.id, true)}
-                      disabled={isDescriptionLoading()}
-                    >
-                      Обновить анализ
-                    </Button>
-                  )}
+                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                      <MarkdownRenderer>{doc.description.text}</MarkdownRenderer>
+                    </Paper>
+                    {doc.description && isDescriptionUpdateAvailable() && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<RefreshIcon />}
+                        sx={{ mt: 2 }}
+                        onClick={() => analyseDocumentDescription(doc.id, true)}
+                        disabled={isDescriptionLoading()}
+                      >
+                        Обновить анализ
+                      </Button>
+                    )}
                   </Box>
                 ) : getDescriptionStatus() === "FAILED" ? (
                   <Box sx={{ textAlign: "center", py: 4 }}>
@@ -312,20 +464,20 @@ const ContractorDocument = () => {
                   </Box>
                 ) : getRisksStatus() === "FINISHED" && doc.risks && doc.risks.text ? (
                   <Box>
-                  <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
-                    <MarkdownRenderer>{doc.risks.text}</MarkdownRenderer>
-                  </Paper>
-                  {doc.risks && isRisksUpdateAvailable() && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<RefreshIcon />}
-                      sx={{ mt: 2 }}
-                      onClick={() => analyseDocumentRisks(doc.id, true)}
-                      disabled={isRisksLoading()}
-                    >
-                      Обновить анализ
-                    </Button>
-                  )}
+                    <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default", borderRadius: 2 }}>
+                      <MarkdownRenderer>{doc.risks.text}</MarkdownRenderer>
+                    </Paper>
+                    {doc.risks && isRisksUpdateAvailable() && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<RefreshIcon />}
+                        sx={{ mt: 2 }}
+                        onClick={() => analyseDocumentRisks(doc.id, true)}
+                        disabled={isRisksLoading()}
+                      >
+                        Обновить анализ
+                      </Button>
+                    )}
                   </Box>
                 ) : getRisksStatus() === "FAILED" ? (
                   <Box sx={{ textAlign: "center", py: 4 }}>
@@ -402,4 +554,3 @@ const ContractorDocument = () => {
 }
 
 export default ContractorDocument
-
