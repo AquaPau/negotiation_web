@@ -49,16 +49,24 @@ const Login = () => {
     event.preventDefault()
   }
 
+  // Обновим функцию handleSubmit для работы с сессионными куками
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
     try {
       const response = await api.login({ email, password })
-      login(response.data)
 
-      // Перенаправляем пользователя на страницу, с которой он пришел, или на главную
-      const from = location.state?.from?.pathname || "/"
-      navigate(from)
+      // Проверяем, что запрос прошел успешно
+      if (response.status === 200) {
+        // Сохраняем данные пользователя
+        login(response.data)
+
+        // Перенаправляем пользователя на страницу, с которой он пришел, или на главную
+        const from = location.state?.from?.pathname || "/"
+        navigate(from)
+      } else {
+        throw new Error("Ошибка входа в систему")
+      }
     } catch (error) {
       const message = error?.response?.data ?? "Неверный email или пароль"
       setErrorMessage(message)

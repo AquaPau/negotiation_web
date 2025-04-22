@@ -34,7 +34,7 @@ const Footer = () => {
           <Grid item xs={12} sm={4}>
             <Box sx={{ mb: 2 }}></Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Система для управления юридическими документами и анализа рисков
+              Система для подготовки к переговорам на основе юридических документов
             </Typography>
           </Grid>
 
@@ -54,7 +54,7 @@ const Footer = () => {
                   }}
                 >
                   <HelpOutlineIcon sx={{ mr: 1, fontSize: 18 }} />
-                  <Typography variant="body2">Часто задаваемые вопросы</Typography>
+                  <Typography variant="body2">Описание проекта</Typography>
                 </Link>
               </Box>
             </Box>
@@ -88,12 +88,12 @@ const Footer = () => {
           {!isMobile && (
             <Box>
               <Typography variant="body2" color="text.secondary" component="span" sx={{ mx: 1 }}>
-                <Link to="/terms" style={{ color: "inherit", textDecoration: "none" }}>
+                <Link to="/terms" className="disabledCursor" onClick={ (event) => event.preventDefault() } style={{ color: "inherit", textDecoration: "none" }}>
                   Условия использования
                 </Link>
               </Typography>
               <Typography variant="body2" color="text.secondary" component="span" sx={{ mx: 1 }}>
-                <Link to="/privacy" style={{ color: "inherit", textDecoration: "none" }}>
+                <Link to="/privacy" className="disabledCursor" onClick={ (event) => event.preventDefault() } style={{ color: "inherit", textDecoration: "none" }}>
                   Политика конфиденциальности
                 </Link>
               </Typography>
