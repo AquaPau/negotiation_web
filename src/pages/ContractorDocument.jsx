@@ -295,21 +295,27 @@ const ContractorDocument = () => {
     return (status && status !== "FINISHED" && status !== "FAILED") || descriptionPollingIntervalRef.current !== null
   }
 
+  // Обновим функцию isRisksLoading, чтобы она также проверяла, выполняется ли анализ содержания
   const isRisksLoading = () => {
     const status = getRisksStatus()
     return (status && status !== "FINISHED" && status !== "FAILED") || risksPollingIntervalRef.current !== null
   }
 
-  // Определение, доступна ли кнопка обновления анализа содержимого
+  // Добавим новую функцию для проверки, выполняется ли какой-либо анализ
+  const isAnyAnalysisInProgress = () => {
+    return isDescriptionLoading() || isRisksLoading()
+  }
+
+  // Обновим функции для определения доступности кнопок обновления
   const isDescriptionUpdateAvailable = () => {
     const status = getDescriptionStatus()
-    return !status || status === "FINISHED" || status === "FAILED"
+    return (!status || status === "FINISHED" || status === "FAILED") && !isRisksLoading()
   }
 
   // Определение, доступна ли кнопка обновления анализа рисков
   const isRisksUpdateAvailable = () => {
     const status = getRisksStatus()
-    return !status || status === "FINISHED" || status === "FAILED"
+    return (!status || status === "FINISHED" || status === "FAILED") && !isDescriptionLoading()
   }
 
   if (isLoading) {
@@ -403,7 +409,7 @@ const ContractorDocument = () => {
                         startIcon={<RefreshIcon />}
                         sx={{ mt: 2 }}
                         onClick={() => analyseDocumentDescription(doc.id, true)}
-                        disabled={isDescriptionLoading()}
+                        disabled={isAnyAnalysisInProgress()}
                       >
                         Обновить анализ
                       </Button>
@@ -420,7 +426,7 @@ const ContractorDocument = () => {
                       startIcon={<RefreshIcon />}
                       sx={{ mt: 2 }}
                       onClick={() => analyseDocumentDescription(doc.id, true)}
-                      disabled={isDescriptionLoading()}
+                      disabled={isAnyAnalysisInProgress()}
                     >
                       Обновить анализ
                     </Button>
@@ -434,6 +440,7 @@ const ContractorDocument = () => {
                       variant="contained"
                       onClick={() => analyseDocumentDescription(doc.id, false)}
                       sx={{ mt: 2 }}
+                      disabled={isAnyAnalysisInProgress()}
                     >
                       Выполнить анализ
                     </Button>
@@ -473,7 +480,7 @@ const ContractorDocument = () => {
                         startIcon={<RefreshIcon />}
                         sx={{ mt: 2 }}
                         onClick={() => analyseDocumentRisks(doc.id, true)}
-                        disabled={isRisksLoading()}
+                        disabled={isAnyAnalysisInProgress()}
                       >
                         Обновить анализ
                       </Button>
@@ -490,7 +497,7 @@ const ContractorDocument = () => {
                       startIcon={<RefreshIcon />}
                       sx={{ mt: 2 }}
                       onClick={() => analyseDocumentRisks(doc.id, true)}
-                      disabled={isRisksLoading()}
+                      disabled={isAnyAnalysisInProgress()}
                     >
                       Обновить анализ
                     </Button>
@@ -500,7 +507,12 @@ const ContractorDocument = () => {
                     <Typography color="text.secondary" gutterBottom>
                       Анализ рисков документа не выполнен
                     </Typography>
-                    <Button variant="contained" onClick={() => analyseDocumentRisks(doc.id, false)} sx={{ mt: 2 }}>
+                    <Button
+                      variant="contained"
+                      onClick={() => analyseDocumentRisks(doc.id, false)}
+                      sx={{ mt: 2 }}
+                      disabled={isAnyAnalysisInProgress()}
+                    >
                       Выполнить анализ рисков
                     </Button>
                   </Box>
@@ -554,3 +566,4 @@ const ContractorDocument = () => {
 }
 
 export default ContractorDocument
+
