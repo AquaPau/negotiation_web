@@ -120,10 +120,13 @@ const ProjectDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
             {selectedFiles.length > 0 ? "Добавить еще файлы" : "Выбрать файлы"}
             <VisuallyHiddenInput ref={fileInputRef} type="file" id="files" multiple onChange={handleFileChange} />
           </Button>
+          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+            К загрузке доступны расширения .doc, .docx, .txt, .pdf (не сканы)
+          </Typography>
 
           {selectedFiles.length === 0 && (
             <Alert severity="info" sx={{ mt: 2 }}>
-              Выберите файлы для загрузки
+              Выберите файлы для загрузки. К загрузке доступны расширения .doc, .docx, .txt, .pdf (не сканы)
             </Alert>
           )}
 
