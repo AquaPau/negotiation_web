@@ -141,7 +141,7 @@ export const api = {
       },
     })
 
-    return publicAxios.get(`/api/faq`)
+    return publicAxios.get(`/faq`)
   },
 
   //Task status
