@@ -79,7 +79,7 @@ const CompanyDocumentUploadDialog = ({ isOpen, onClose, onUploadSuccess, onUploa
 
       onClose()
     } catch (error) {
-      onUploadError("Ошибка загрузки файлов: " + error.message)
+      onUploadError("Ошибка загрузки файлов. " + error.response.data)
     } finally {
       setUploading(false)
     }
